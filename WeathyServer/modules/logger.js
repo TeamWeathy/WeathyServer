@@ -1,10 +1,10 @@
-const { createLogger, format, transports } = require("winston");
-const winstonDaily = require("winston-daily-rotate-file");
+const { createLogger, format, transports } = require('winston');
+const winstonDaily = require('winston-daily-rotate-file');
 
-const appRoot = require("app-root-path");
-const fs = require("fs");
+const appRoot = require('app-root-path');
+const fs = require('fs');
 
-const env = process.env.NODE_ENV || "development";
+const env = process.env.NODE_ENV || 'development';
 const logDir = `${appRoot}/logs`;
 
 // Create the log directory if it does not exist
@@ -17,40 +17,40 @@ const logFormat = printf(({ level, message, label, timestamp }) => {
 });
 
 const logger = createLogger({
-    level: "info",
+    level: 'info',
     format: combine(
         label({
-            label: "Weathy"
+            label: 'Weathy',
         }),
         timestamp({
-            format: "YYYY-MM-DD HH:mm:ss"
+            format: 'YYYY-MM-DD HH:mm:ss',
         }),
         logFormat
     ),
     transports: [
         new winstonDaily({
-            level: "info",
-            datePattern: "YYYY-MM-DD",
+            level: 'info',
+            datePattern: 'YYYY-MM-DD',
             dirname: logDir,
             filename: `%DATE%.log`,
             maxFiles: 30,
-            zippedArchive: true
+            zippedArchive: true,
         }),
         new winstonDaily({
-            level: "error",
-            datePattern: "YYYY-MM-DD",
+            level: 'error',
+            datePattern: 'YYYY-MM-DD',
             dirname: logDir,
             filename: `%DATE%.error.log`,
             maxFiles: 30,
-            zippedArchive: true
-        })
-    ]
+            zippedArchive: true,
+        }),
+    ],
 });
 
-if (env !== "production") {
+if (env !== 'production') {
     logger.add(
         new transports.Console({
-            format: format.combine(format.colorize(), format.simple())
+            format: format.combine(format.colorize(), format.simple()),
         })
     );
 }

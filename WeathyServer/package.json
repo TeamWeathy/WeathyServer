@@ -12,6 +12,9 @@
     "http-errors": "~1.6.3",
     "jade": "~1.11.0",
     "morgan": "~1.9.1",
+    "mysql2": "^2.2.5",
+    "sequelize": "^6.3.5",
+    "sequelize-cli": "^6.2.0",
     "winston": "^3.3.3",
     "winston-daily-rotate-file": "^4.5.0"
   },

@@ -15,6 +15,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
   <tr>
     <td align="center"><a href="https://github.com/yxxshin"><img src="https://avatars0.githubusercontent.com/u/63148508?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Yeon Sang Shin</b></sub></a><br /><a href="https://github.com/TeamWeathy/WeathyServer/commits?author=yxxshin" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/seonuk"><img src="https://avatars3.githubusercontent.com/u/22928068?v=4?s=100" width="100px;" alt=""/><br /><sub><b>seonuk</b></sub></a><br /><a href="https://github.com/TeamWeathy/WeathyServer/commits?author=seonuk" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/dshyun0226"><img src="https://avatars3.githubusercontent.com/u/8098698?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Jahyun Kim</b></sub></a><br /><a href="https://github.com/TeamWeathy/WeathyServer/commits?author=dshyun0226" title="Code">💻</a></td>
   </tr>
 </table>
 

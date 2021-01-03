@@ -26,6 +26,7 @@
 
 
 ### ER Diagram
+![image](https://user-images.githubusercontent.com/22928068/103475327-a4108280-4def-11eb-8d7b-0063b61ebb7b.png)
 
 
 ### 서버 아키텍쳐

@@ -1,7 +1,7 @@
 const assert = require('assert');
 const decache = require('decache');
 const { transports } = require('winston');
-var logger = require('../../modules/logger');
+let logger = require('../../modules/logger');
 
 function writeAllLevelLog(log) {
     logger.verbose(log);
@@ -26,7 +26,7 @@ describe('logger test', function () {
             process.env.NODE_ENV = prev_node_env;
         });
         it('production mode not logs to console', () => {
-            for (var i = 0; i < logger.transports.length; ++i) {
+            for (let i = 0; i < logger.transports.length; ++i) {
                 assert.ok(
                     !(logger.transports[i] instanceof transports.Console)
                 );
@@ -41,8 +41,8 @@ describe('logger test', function () {
             process.env.NODE_ENV = prev_node_env;
         });
         it('development mode logs to console', () => {
-            var cnt_console_logger = 0;
-            for (var i = 0; i < logger.transports.length; ++i) {
+            let cnt_console_logger = 0;
+            for (let i = 0; i < logger.transports.length; ++i) {
                 if (logger.transports[i] instanceof transports.Console) {
                     cnt_console_logger += 1;
                 }

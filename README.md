@@ -29,6 +29,7 @@
 
 
 ### 서버 아키텍쳐
+<img width="1282" alt="스크린샷 2021-01-03 오후 6 13 24" src="https://user-images.githubusercontent.com/22928068/103475300-601d7d80-4def-11eb-98c9-c04ab3d90770.png">
 
 
 ### 핵심 기능 설명

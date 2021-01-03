@@ -4,6 +4,9 @@
       "prettier"
     ],
     "env": {
+      "node": true,
+      "jest": true,
+      "mocha": true,
       "browser": false,
       "commonjs": true,
       "es2021": true

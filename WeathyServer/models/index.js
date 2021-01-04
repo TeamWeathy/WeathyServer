@@ -19,4 +19,21 @@ if (config.use_env_variable) {
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
+db.HourlyWeather = require('./hourlyWeather')(sequelize, Sequelize);
+db.DailyWeather = require('./dailyWeather')(sequelize, Sequelize);
+db.Location = require('./location')(sequelize, Sequelize);
+db.Climate = require('./climate')(sequelize, Sequelize);
+
+db.Location.hasMany(db.HourlyWeather, { onDelete: 'cascade' });
+db.HourlyWeather.belongsTo(db.Location);
+
+db.Location.hasMany(db.HourlyWeather, { onDelete: 'cascade' });
+db.DailyWeather.belongsTo(db.Location);
+
+db.Climate.hasMany(db.DailyWeather, { onDelete: 'cascade' });
+db.DailyWeather.belongsTo(db.Climate);
+
+db.Climate.hasMany(db.HourlyWeather, { onDelete: 'cascade' });
+db.HourlyWeather.belongsTo(db.Climate);
+
 module.exports = db;

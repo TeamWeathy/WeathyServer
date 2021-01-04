@@ -20,10 +20,10 @@ const logger = createLogger({
     level: 'info',
     format: combine(
         label({
-            label: 'Weathy',
+            label: 'Weathy'
         }),
         timestamp({
-            format: 'YYYY-MM-DD HH:mm:ss',
+            format: 'YYYY-MM-DD HH:mm:ss'
         }),
         logFormat
     ),
@@ -34,7 +34,7 @@ const logger = createLogger({
             dirname: logDir,
             filename: `%DATE%.log`,
             maxFiles: 30,
-            zippedArchive: true,
+            zippedArchive: true
         }),
         new winstonDaily({
             level: 'error',
@@ -42,15 +42,15 @@ const logger = createLogger({
             dirname: logDir,
             filename: `%DATE%.error.log`,
             maxFiles: 30,
-            zippedArchive: true,
-        }),
-    ],
+            zippedArchive: true
+        })
+    ]
 });
 
 if (env !== 'production') {
     logger.add(
         new transports.Console({
-            format: format.combine(format.colorize(), format.simple()),
+            format: format.combine(format.colorize(), format.simple())
         })
     );
 }

@@ -1,48 +1,42 @@
-'use strict';
-
-const fs = require('fs');
-const path = require('path');
 const Sequelize = require('sequelize');
-const basename = path.basename(__filename);
 const env = process.env.NODE_ENV || 'development';
-const config = require(__dirname + '/../config/config.json')[env];
-const db = {};
+const config = require('../config/database.json')[env];
+const batch_DB = {};
 
-let sequelize;
+let batchSequelize;
+
 if (config.use_env_variable) {
-    sequelize = new Sequelize(process.env[config.use_env_variable], config);
+    batchSequelize = new Sequelize(
+        process.env[config.use_env_variable],
+        config['batch']
+    );
 } else {
-    sequelize = new Sequelize(
-        config.database,
-        config.username,
-        config.password,
-        config
+    batchSequelize = new Sequelize(
+        config['batch'].database,
+        config['batch'].username,
+        config['batch'].password,
+        config['batch']
     );
 }
 
-fs.readdirSync(__dirname)
-    .filter((file) => {
-        return (
-            file.indexOf('.') !== 0 &&
-            file !== basename &&
-            file.slice(-3) === '.js'
-        );
-    })
-    .forEach((file) => {
-        const model = require(path.join(__dirname, file))(
-            sequelize,
-            Sequelize.DataTypes
-        );
-        db[model.name] = model;
-    });
+batch_DB.sequelize = batchSequelize;
+batch_DB.Sequelize = Sequelize;
 
-Object.keys(db).forEach((modelName) => {
-    if (db[modelName].associate) {
-        db[modelName].associate(db);
-    }
-});
+batch_DB.HourlyWeather = require('./hourlyWeather')(batchSequelize, Sequelize);
+batch_DB.DailyWeather = require('./dailyWeather')(batchSequelize, Sequelize);
+batch_DB.Location = require('./location')(batchSequelize, Sequelize);
+batch_DB.Climate = require('./climate')(batchSequelize, Sequelize);
 
-db.sequelize = sequelize;
-db.Sequelize = Sequelize;
+batch_DB.Location.hasMany(batch_DB.HourlyWeather, { onDelete: 'cascade' });
+batch_DB.HourlyWeather.belongsTo(batch_DB.Location);
 
-module.exports = db;
+batch_DB.Location.hasMany(batch_DB.HourlyWeather, { onDelete: 'cascade' });
+batch_DB.DailyWeather.belongsTo(batch_DB.Location);
+
+batch_DB.Climate.hasMany(batch_DB.DailyWeather, { onDelete: 'cascade' });
+batch_DB.DailyWeather.belongsTo(batch_DB.Climate);
+
+batch_DB.Climate.hasMany(batch_DB.HourlyWeather, { onDelete: 'cascade' });
+batch_DB.HourlyWeather.belongsTo(batch_DB.Climate);
+
+module.exports = batch_DB;

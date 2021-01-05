@@ -36,7 +36,13 @@ module.exports = (sequelize, DataTypes) => {
         {
             underscored: true,
             freezeTableName: true,
-            paranoid: true
+            paranoid: true,
+            indexes: [
+                {
+                    unique: true,
+                    fields: ['date', 'hour', 'location_id']
+                }
+            ]
         }
     );
 };

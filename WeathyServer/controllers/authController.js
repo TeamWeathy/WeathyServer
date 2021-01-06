@@ -1,20 +1,34 @@
+const createError = require('http-errors');
+const { User } = require('../models');
+const exception = require('../modules/exception');
 const statusCode = require('../modules/statusCode');
+const { userService, tokenService } = require('../services');
 
 module.exports = {
-    login: (req, res) => {
+    login: async (req, res, next) => {
         const { uuid } = req.body;
-        let user;
+        let user_id;
         try {
-            user = await userService.getUserByAccount(uuid);
+            user_id = await userService.getUserByAccount(uuid);
         } catch (error) {
-            return res.status(statusCode.INVALID_ACCOUNT);
+            switch (error.message) {
+                case exception.INVALID_TOKEN:
+                    next(createError(403));
+                    break;
+                case exception.EXPIRED_TOKEN:
+                    next(createError(403));
+                    break;
+                default:
+                    next(createError(500));
+            }
         }
 
-        let token = await tokenService.refreshTokenOfUser(user_id);
+        const token = await tokenService.refreshTokenOfUser(user_id);
+        const user = await User.findOne({ where: { id: user_id } });
         return res.status(statusCode.OK).json({
-            "user": user,
-            "token": token,
-            "message": "로그인 성공"
+            user: user,
+            token: token,
+            message: '로그인 성공'
         });
     }
 };

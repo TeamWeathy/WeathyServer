@@ -1,4 +1,4 @@
-modules.export = {
-    tokensService : require('./tokenService'),
-    userService : require('./userService')
+module.exports = {
+    tokenService: require('./tokenService'),
+    userService: require('./userService')
 };

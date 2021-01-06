@@ -1,20 +1,15 @@
 module.exports = (sequelize, DataTypes) => {
     return sequelize.define(
-        'Clothes',
+        'Token',
         {
-            user_id: {
-                type: DataTypes.INTEGER,
-                allowNull: false
-            },
-            name: {
+            token: {
                 type: DataTypes.STRING(45),
                 allowNull: false
             }
         },
         {
             underscored: true,
-            freezeTableName: true,
-            paranoid: true
+            freezeTableName: true
         }
     );
 };

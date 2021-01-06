@@ -28,6 +28,7 @@ db.ClothesCategory = require('./category')(sequelize, Sequelize);
 db.Clothes = require('./clothes')(sequelize, Sequelize);
 db.WeathyClothes = require('./weathyClothes')(sequelize, Sequelize);
 db.Weathy = require('./weathy')(sequelize, Sequelize);
+db.Token = require('./token')(sequelize, Sequelize);
 
 db.Location.hasMany(
     db.HourlyWeather,
@@ -92,5 +93,8 @@ db.DailyWeather.hasMany(
     { onDelete: 'cascade' }
 );
 db.Weathy.belongsTo(db.DailyWeather, { foreignKey: 'dailyweather_id' });
+
+db.User.hasOne(db.Token, { foreignKey: 'user_id' }, { onDelete: 'cascade' });
+db.Token.belongsTo(db.User, { foreignKey: 'user_id' });
 
 module.exports = db;

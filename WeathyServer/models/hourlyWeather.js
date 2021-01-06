@@ -1,5 +1,3 @@
-const { Location, Climate } = require('../models');
-
 module.exports = (sequelize, DataTypes) => {
     return sequelize.define(
         'HourlyWeathers',
@@ -15,22 +13,6 @@ module.exports = (sequelize, DataTypes) => {
             temperature: {
                 type: DataTypes.INTEGER,
                 allowNull: false
-            },
-            location_id: {
-                type: DataTypes.BIGINT,
-                allowNull: false,
-                reference: {
-                    model: Location,
-                    key: 'id'
-                }
-            },
-            climate_id: {
-                type: DataTypes.INTEGER,
-                allowNull: false,
-                reference: {
-                    model: Climate,
-                    key: 'id'
-                }
             }
         },
         {

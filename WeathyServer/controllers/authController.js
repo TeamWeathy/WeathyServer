@@ -7,11 +7,21 @@ const { userService, tokenService } = require('../services');
 module.exports = {
     login: async (req, res, next) => {
         const { uuid } = req.body;
-        let user_id;
+
         try {
-            user_id = await userService.getUserByAccount(uuid);
+            const userId = await userService.getUserByAccount(uuid);
+            const token = await tokenService.refreshTokenOfUser(userId);
+            const user = await User.findOne({ where: { id: userId } });
+            return res.status(statusCode.OK).json({
+                user: user,
+                token: token,
+                message: '로그인 성공'
+            });
         } catch (error) {
             switch (error.message) {
+                case exception.NO_USER:
+                    next(createError(400));
+                    break;
                 case exception.INVALID_TOKEN:
                     next(createError(403));
                     break;
@@ -22,13 +32,5 @@ module.exports = {
                     next(createError(500));
             }
         }
-
-        const token = await tokenService.refreshTokenOfUser(user_id);
-        const user = await User.findOne({ where: { id: user_id } });
-        return res.status(statusCode.OK).json({
-            user: user,
-            token: token,
-            message: '로그인 성공'
-        });
     }
 };

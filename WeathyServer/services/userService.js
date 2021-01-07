@@ -8,7 +8,7 @@ module.exports = {
         if (user === null) {
             throw Error(exception.NO_USER);
         } else {
-            return user.id;
+            return user;
         }
     }
 };

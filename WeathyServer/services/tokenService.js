@@ -1,23 +1,18 @@
 const cryptoRandomString = require('crypto-random-string');
 const dayjs = require('dayjs');
-const { Token, User } = require('../models');
+const { Token } = require('../models');
 const exception = require('../modules/exception');
 
-const EXPIRES_IN = 100; // 토큰 유효 기간 (100일)
-
-const generateToken = () => {
-    return cryptoRandomString({ length: 30, type: 'alphanumeric' });
-};
+const TOKEN_EXPIRES_IN_HOURS = 1; // 토큰 유효 기간 (100일)
 
 const checkTokenExpired = async (token) => {
     // token이 expired 되었는지 확인
-    const userToken = await Token.findOne({ where: { token: token } });
-    const updatedTime = dayjs(userToken.updated_at);
-    const expirationTime = updatedTime.add(EXPIRES_IN, 'd');
+    const updatedTime = dayjs(token.updated_at);
+    const expirationTime = updatedTime.add(TOKEN_EXPIRES_IN_HOURS, 'h');
 
-    const dayjsToday = dayjs(new Date());
+    const now = dayjs(new Date());
 
-    if (dayjsToday.isBefore(expirationTime)) {
+    if (now.isBefore(expirationTime)) {
         return false;
     } else {
         return true;
@@ -29,11 +24,15 @@ const getUserIdByToken = async (token) => {
     const userToken = await Token.findOne({ where: { token: token } });
     if (userToken === null) {
         throw Error(exception.INVALID_TOKEN);
-    } else if (await checkTokenExpired(token)) {
+    } else if (await checkTokenExpired(userToken)) {
         throw Error(exception.EXPIRED_TOKEN);
     } else {
         return userToken.user_id;
     }
+};
+
+const generateToken = () => {
+    return cryptoRandomString({ length: 30, type: 'alphanumeric' });
 };
 
 module.exports = {
@@ -44,6 +43,6 @@ module.exports = {
     refreshTokenOfUser: async (user_id) => {
         const token = generateToken();
         // Sequalizer에서 Token 업데이트 하는 코드 추가
-        await User.update({ id: user_id }, { $set: { token: token } });
+        await Token.update({ user_id: user_id }, { $set: { token: token } });
     }
 };

@@ -6,17 +6,17 @@ const options = {
         info: {
             title: 'Weathy API',
             version: '1.0.0',
-            description: 'Weathy API with express',
+            description: 'Weathy API with express'
         },
         host: 'localhost:3000',
-        basePath: '/',
+        basePath: '/'
     },
-    apis: ['./routes/*.js', './swagger/*'],
+    apis: ['./routes/*.js', './swagger/*']
 };
 
 const specs = swaggereJsdoc(options);
 
 module.exports = {
     swaggerUi,
-    specs,
+    specs
 };

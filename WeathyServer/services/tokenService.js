@@ -38,11 +38,12 @@ const generateToken = () => {
 module.exports = {
     isValidToken: async (user_id, token) => {
         const id = await getUserIdByToken(token);
-        return id === user_id;
+        return id === user_id && token.split(':')[0] == user_id;
     },
     refreshTokenOfUser: async (user_id) => {
-        const token = generateToken();
+        const token = user_id + ':' + generateToken();
         // Sequalizer에서 Token 업데이트 하는 코드 추가
-        await Token.update({ user_id: user_id }, { $set: { token: token } });
+        await Token.update({ token: token }, { where: { user_id: user_id } });
+        return token;
     }
 };

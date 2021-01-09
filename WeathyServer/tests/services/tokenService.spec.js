@@ -2,14 +2,21 @@ const assert = require('assert');
 const dayjs = require('dayjs');
 const { Token } = require('../../models');
 const {
+    isValidTokenById,
     isValidToken,
     refreshTokenOfUser
 } = require('../../services/tokenService');
 
 describe('tokenService test', function () {
-    describe('isValidToken Test', function () {
-        it('check valid token', async () => {
-            assert.ok(await isValidToken(1, '1:aa'));
+    describe('isValidTokenById Test', function () {
+        it('check valid token by id', async () => {
+            assert.ok(await isValidTokenById(1, '1:aa'));
+        });
+    });
+
+    describe('isValidToken test', function () {
+        it('check valild token', async () => {
+            assert.ok(await isValidToken('1:aa'));
         });
     });
 
@@ -25,8 +32,8 @@ describe('tokenService test', function () {
             secondTime = dayjs(token.updated_at);
         });
 
-        after('put token value to the original one', () => {
-            Token.update({ token: '1:aa' }, { where: { user_id: 1 } });
+        after('put token value to the original one', async () => {
+            await Token.update({ token: '1:aa' }, { where: { user_id: 1 } });
         });
 
         it('token value should be updated', () => {

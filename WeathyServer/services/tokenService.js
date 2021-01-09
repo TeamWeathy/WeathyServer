@@ -36,9 +36,13 @@ const generateToken = () => {
 };
 
 module.exports = {
-    isValidToken: async (user_id, token) => {
+    isValidTokenById: async (user_id, token) => {
         const id = await getUserIdByToken(token);
-        return id === user_id && token.split(':')[0] == user_id;
+        return id == user_id && token.split(':')[0] == user_id;
+    },
+    isValidToken: async (token) => {
+        const id = await getUserIdByToken(token);
+        return id == token.split(':')[0];
     },
     refreshTokenOfUser: async (user_id) => {
         const token = user_id + ':' + generateToken();

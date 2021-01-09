@@ -53,5 +53,10 @@ module.exports = {
             time = 0;
         }
         return { date: formatDate(day), time };
+    },
+    getNextDay: (date) => {
+        let day = new Date(date);
+        day.setDate(day.getDate() + 1);
+        return formatDate(day);
     }
 };

@@ -63,7 +63,7 @@ module.exports = {
             }
         }
     },
-    getHourlyWeatherForcast: async (req, res, next) => {
+    getHourlyWeatherForecast: async (req, res, next) => {
         let { code, date } = req.query;
         if (!code || !date) {
             return next(createError(400));
@@ -93,5 +93,54 @@ module.exports = {
             hourlyWeatherList,
             message: '시간 별 날씨 조회 성공'
         });
+    },
+    getDailyWeatherForecast: async (req, res, next) => {
+        let { code, date } = req.query;
+        if (!code || !date) {
+            return next(createError(400));
+        }
+
+        date = date.split('T')[0];
+        if (!date) {
+            return next(createError(400));
+        }
+
+        let dailyWeatherList = [];
+        for (let i = 0; i < 7; ++i) {
+            dailyWeatherList.push_back(
+                weatherService.getDailyWeather(code, date)
+            );
+            date = dateUtils.getNextDay(date);
+        }
+        return res.status(statusCode.OK).json({
+            dailyWeatherList,
+            message: '일자 별 날씨 조회 성공'
+        });
+    },
+    getExtraDailyWeather: async (req, res, next) => {
+        let { code, date } = req.query;
+        if (!code || !date) {
+            return next(createError(400));
+        }
+
+        date = date.split('T')[0];
+        if (!date) {
+            return next(createError(400));
+        }
+
+        try {
+            let extraWeather = weatherService.getExtraDailyWeather(code, date);
+            return res.status(statusCode.ok).json({
+                extraWeather,
+                message: '상세 날씨 조회 성공'
+            });
+        } catch (error) {
+            switch (error.message) {
+                case exception.NO_DATA:
+                    return next(createError(204));
+                default:
+                    return next(createError(400));
+            }
+        }
     }
 };

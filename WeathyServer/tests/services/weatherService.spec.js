@@ -1,8 +1,9 @@
 const assert = require('assert');
 const dateUtils = require('../../utils/dateUtils');
 const { weatherService } = require('../../services');
+const exception = require('../../modules/exception');
 
-describe('location service test', function () {
+describe('weather service test', function () {
     describe('getDailyWeather test', function () {
         it('getDailyWeather returns dailyWeather', async function () {
             const dailyWeather = await weatherService.getDailyWeather(
@@ -42,6 +43,23 @@ describe('location service test', function () {
                 '2020-01-01'
             );
             assert(dailyWeather == null);
+        });
+    });
+
+    describe('getExtraDailyWeather test', function () {
+        it('getExtraDailyWeather returns extraWeather', async function () {
+            const extraWeather = await weatherService.getExtraDailyWeather(
+                1100000000,
+                '2021-01-01'
+            );
+            assert(extraWeather.rain.value == 10);
+            assert(extraWeather.humidity.value == 10);
+            assert(extraWeather.wind.value == 91.9);
+        });
+        it('getExtraDailyWeather throw error if not exists', async function () {
+            await assert.ok(async () => {
+                await weatherService.getExtraDailyWeather(-2, '2020-01-01');
+            }, exception.NO_DATA);
         });
     });
 });

@@ -62,4 +62,11 @@ describe('dateUtils test', function () {
             assert.strictEqual(time, 0);
         });
     });
+
+    describe('getNextDay test', function () {
+        it('getNextDay increase day', function () {
+            const date = dateUtils.getNextDay('1999-01-01');
+            assert.strictEqual(date, '1999-01-02');
+        });
+    });
 });

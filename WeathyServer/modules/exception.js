@@ -1,6 +1,6 @@
 module.exports = {
     // COMMON
-    NO_DATE: 'NO_DATA',
+    NO_DATA: 'NO_DATA',
 
     // TOKEN
     EXPIRED_TOKEN: 'EXPIRED_TOKEN',

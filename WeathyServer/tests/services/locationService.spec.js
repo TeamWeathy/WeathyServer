@@ -17,4 +17,18 @@ describe('location service test', function () {
             }, exception.NO_DATA);
         });
     });
+    describe('getLocationsByKeyword', function () {
+        it('getLocationsByKeyword returns locations', async function () {
+            const locations = await locationService.getLocationsByKeyword(
+                '서울'
+            );
+            assert.strictEqual(locations.length, 26);
+        });
+        it('getLocationsByKeyword returns empty array if not exists', async function () {
+            const locations = await locationService.getLocationsByKeyword(
+                '김자현'
+            );
+            assert.strictEqual(locations.length, 0);
+        });
+    });
 });

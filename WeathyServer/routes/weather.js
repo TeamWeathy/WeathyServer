@@ -12,3 +12,4 @@ router.get(
     weatherController.getDailyWeatherForecast
 );
 router.get('/weather/daily/extra', weatherController.getExtraDailyWeather);
+router.get('/weather/overviews', weathercController.getWeathersByKeyword);

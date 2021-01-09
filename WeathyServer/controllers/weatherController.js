@@ -35,23 +35,17 @@ module.exports = {
         }
 
         try {
-            const location = locationService.getLocationByCode(code);
-            const dailyWeather = weatherService.getDailyWeather(code, date);
-            const hourlyWeather = weatherService.getHourlyWeather(
+            const overviewWeather = weatherService.getOverviewWeather(
                 code,
                 date,
                 time,
                 dateUtils.format12
             );
-            if (!dailyWeather || !hourlyWeather) {
-                throw exception.NO_DATA;
+            if (!overviewWeather) {
+                throw Error(exception.NO_DATA);
             }
             return res.status(statusCode.OK).json({
-                overviewWeather: {
-                    region: location,
-                    dailyWeather,
-                    hourlyWeather
-                },
+                overviewWeather,
                 message: '실시간 날씨 정보 반환 성공'
             });
         } catch (error) {
@@ -140,6 +134,38 @@ module.exports = {
                     return next(createError(204));
                 default:
                     return next(createError(400));
+            }
+        }
+    },
+    getWeathersByKeyword: async (req, res, next) => {
+        let { keyword, date } = req.query;
+        if (!keyword || !date) {
+            return next(createError(400));
+        }
+
+        let time = date.split('T')[1];
+        date = date.split('T')[0];
+        if (!date || !time) {
+            return next(createError(400));
+        }
+
+        try {
+            const overviewWeatherList = weatherService.getOverviewWeathers(
+                keyword,
+                date,
+                time,
+                dateUtils.format12
+            );
+            return res.status(statusCode.OK).json({
+                overviewWeatherList,
+                message: '검색 성공'
+            });
+        } catch (error) {
+            switch (error.message) {
+                case exception.NO_DATA:
+                    return next(createError(204));
+                default:
+                    return next(createError(500));
             }
         }
     }

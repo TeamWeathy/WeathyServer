@@ -2,6 +2,7 @@ const dateUtils = require('../utils/dateUtils');
 const exception = require('../modules/exception');
 const { DailyWeather, HourlyWeather } = require('../models');
 const climateService = require('./climateService');
+const locationService = require('./locationService');
 
 const getRainRating = (value) => {
     if (value < 1) return 1;
@@ -29,39 +30,84 @@ const getWindRating = (value) => {
     else return 6;
 };
 
+const getDailyWeather = async (code, date) => {
+    const dailyWeather = await DailyWeather.findOne({
+        where: { location_id: code, date: date }
+    });
+    if (!dailyWeather) {
+        return null;
+    }
+    return {
+        date: {
+            month: dateUtils.getMonth(dailyWeather.date),
+            day: dateUtils.getDay(dailyWeather.date),
+            dayOfWeek: dateUtils.getYoil(dailyWeather.date)
+        },
+        temperature: {
+            maxTemp: dailyWeather.temperature_max,
+            minTemp: dailyWeather.temperature_min
+        }
+    };
+};
+
+const getHourlyWeather = async (code, date, hour, timeFormat) => {
+    const hourlyWeather = await HourlyWeather.findOne({
+        where: { location_id: code, date: date, hour: hour }
+    });
+    if (!hourlyWeather) {
+        return null;
+    }
+    return {
+        time: timeFormat(hourlyWeather.hour),
+        temperature: hourlyWeather.temperature,
+        climate: await climateService.getById(hourlyWeather.climate_id),
+        pop: hourlyWeather.pop
+    };
+};
+
 module.exports = {
-    getDailyWeather: async (code, date) => {
-        const dailyWeather = await DailyWeather.findOne({
-            where: { location_id: code, date: date }
-        });
-        if (!dailyWeather) {
+    getDailyWeather,
+    getHourlyWeather,
+    getOverviewWeather: async (code, date, hour, timeFormat) => {
+        const location = await locationService.getLocationByCode(code);
+        const dailyWeather = await getDailyWeather(code, date);
+        const hourlyWeather = await getHourlyWeather(
+            code,
+            date,
+            hour,
+            timeFormat
+        );
+        if (!dailyWeather || !hourlyWeather) {
             return null;
         }
         return {
-            date: {
-                month: dateUtils.getMonth(dailyWeather.date),
-                day: dateUtils.getDay(dailyWeather.date),
-                dayOfWeek: dateUtils.getYoil(dailyWeather.date)
-            },
-            temperature: {
-                maxTemp: dailyWeather.temperature_max,
-                minTemp: dailyWeather.temperature_min
-            }
+            region: location,
+            dailyWeather,
+            hourlyWeather
         };
     },
-    getHourlyWeather: async (code, date, hour, timeFormat) => {
-        const hourlyWeather = await HourlyWeather.findOne({
-            where: { location_id: code, date: date, hour: hour }
-        });
-        if (!hourlyWeather) {
-            return null;
+    getOverviewWeathers: async (keyword, date, hour, timeFormat) => {
+        const locations = await locationService.getLocationsByKeyword(keyword);
+        let overviewWeatherList = [];
+        for (let i = 0; i < locations.length; ++i) {
+            const location = locations[i];
+            const dailyWeather = await getDailyWeather(location.id, date);
+            const hourlyWeather = await getHourlyWeather(
+                location.id,
+                date,
+                hour,
+                timeFormat
+            );
+            if (!dailyWeather || !hourlyWeather) {
+                continue;
+            }
+            overviewWeatherList.push({
+                region: location,
+                dailyWeather,
+                hourlyWeather
+            });
         }
-        return {
-            time: timeFormat(hourlyWeather.hour),
-            temperature: hourlyWeather.temperature,
-            climate: await climateService.getById(hourlyWeather.climate_id),
-            pop: hourlyWeather.pop
-        };
+        return overviewWeatherList;
     },
     getExtraDailyWeather: async (code, date) => {
         const dailyWeather = await DailyWeather.findOne({

@@ -1,4 +1,5 @@
 const { Location } = require('../models');
+const Sequelize = require('sequelize');
 const exception = require('../modules/exception');
 
 module.exports = {
@@ -15,5 +16,16 @@ module.exports = {
             code: location.id,
             name: location.name
         };
+    },
+    getLocationsByKeyword: async (keyword) => {
+        const Op = Sequelize.Op;
+        const locations = await Location.findAll({
+            where: {
+                name: {
+                    [Op.like]: '%' + keyword + '%'
+                }
+            }
+        });
+        return locations;
     }
 };

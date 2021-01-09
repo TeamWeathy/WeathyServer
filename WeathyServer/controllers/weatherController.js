@@ -8,8 +8,8 @@ module.exports = {
     getWeatherByLocation: async (req, res, next) => {
         // skip token validation
 
-        const { lat, lon, datetime } = req.body;
-        let { code } = req.body;
+        const { lat, lon, datetime } = req.query;
+        let { code } = req.query;
         let date, time;
 
         if (!datetime) {

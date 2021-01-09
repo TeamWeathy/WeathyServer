@@ -3,14 +3,6 @@ const decache = require('decache');
 const { transports } = require('winston');
 let logger = require('../../modules/logger');
 
-function writeAllLevelLog(log) {
-    logger.verbose(log);
-    logger.info(log);
-    logger.debug(log);
-    logger.warn(log);
-    logger.error(log);
-}
-
 describe('logger test', function () {
     let prev_node_env = process.env.NODE_ENV;
     beforeEach('init cache', () => {

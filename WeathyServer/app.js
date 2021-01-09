@@ -3,9 +3,9 @@ const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const morgan = require('morgan');
-const logger = require('./modules/logger');
 
 const indexRouter = require('./routes/index');
+const authRouter = require('/routes/auth');
 const usersRouter = require('./routes/users');
 const { swaggerUi, specs } = require('./modules/swagger');
 
@@ -23,6 +23,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 app.use('/', indexRouter);
+app.use('/auth', authRouter);
 app.use('/users', usersRouter);
 
 // catch 404 and forward to error handler

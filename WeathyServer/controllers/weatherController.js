@@ -8,11 +8,10 @@ module.exports = {
     getWeatherByLocation: async (req, res, next) => {
         // skip token validation
 
-        const { lat, lon, datetime } = req.query;
-        let { code } = req.query;
-        let date, time;
+        const { lat, lon } = req.query;
+        let { code, date } = req.query;
 
-        if (!datetime) {
+        if (!date) {
             return next(createError(400));
         } else if (!code && (!lat || !lon)) {
             return next(createError(400));
@@ -29,8 +28,8 @@ module.exports = {
             }
         }
 
-        date = datetime.split('T')[0];
-        time = datetime.split('T')[1];
+        let time = date.split('T')[1] ? date.split('T')[1] : 12;
+        date = date.split('T')[0];
         if (!date || !time) {
             return next(createError(400));
         }

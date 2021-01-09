@@ -10,7 +10,7 @@ describe('climate service test', function () {
             assert.strictEqual(climate.iconId, 1);
         });
         it('getClimateById throws error if not exists', async function () {
-            await assert.rejects(async () => {
+            await assert.ok(async () => {
                 await climateService.getById(-2);
             }, exception.NO_DATA);
         });

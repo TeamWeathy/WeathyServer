@@ -31,4 +31,18 @@ describe('location service test', function () {
             assert.strictEqual(locations.length, 0);
         });
     });
+    describe('getCode test', function () {
+        it('getCode returns code', async function () {
+            const code = await locationService.getCode(
+                37.57037778,
+                126.98164166666668
+            );
+            assert.strictEqual(code, 1111000000);
+        });
+        it('getCode throws error if not exists', async function () {
+            await assert.ok(async () => {
+                await locationService.getCode(-1, -1);
+            }, exception.SERVER_ERROR);
+        });
+    });
 });

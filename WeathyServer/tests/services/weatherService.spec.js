@@ -61,7 +61,6 @@ describe('weather service test', function () {
                 12,
                 dateUtils.format12
             );
-            console.log(overviewWeather);
             assert.strictEqual(overviewWeather.region.code, 1100000000);
             assert.strictEqual(overviewWeather.region.name, '서울특별시');
             assertDailyWeather(overviewWeather.dailyWeather);

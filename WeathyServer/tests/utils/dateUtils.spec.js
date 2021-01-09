@@ -49,4 +49,17 @@ describe('dateUtils test', function () {
             assert.strictEqual(dateUtils.format24(1), '1시');
         });
     });
+
+    describe('getNextHour test', function () {
+        it('getNextHour increase time', function () {
+            const { date, time } = dateUtils.getNextHour('1999-01-01', 12);
+            assert.strictEqual(date, '1999-01-01');
+            assert.strictEqual(time, 13);
+        });
+        it('getNextHour increase date and reset time when date change', function () {
+            const { date, time } = dateUtils.getNextHour('1999-01-01', 23);
+            assert.strictEqual(date, '1999-01-02');
+            assert.strictEqual(time, 0);
+        });
+    });
 });

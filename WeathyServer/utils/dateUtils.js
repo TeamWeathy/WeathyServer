@@ -8,6 +8,15 @@ const day_of_week = [
     '토요일'
 ];
 
+const formatDate = (d) => {
+    let month = '' + (d.getMonth() + 1);
+    let day = '' + d.getDate();
+    const year = d.getFullYear();
+    if (month.length < 2) month = '0' + month;
+    if (day.length < 2) day = '0' + day;
+    return [year, month, day].join('-');
+};
+
 module.exports = {
     getYear: (date) => {
         return parseInt(date.split('-')[0]);
@@ -35,5 +44,14 @@ module.exports = {
         } else {
             return '오전 ' + hour + '시';
         }
+    },
+    getNextHour: (date, time) => {
+        let day = new Date(date);
+        ++time;
+        if (time == 24) {
+            day.setDate(day.getDate() + 1);
+            time = 0;
+        }
+        return { date: formatDate(day), time };
     }
 };

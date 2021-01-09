@@ -62,5 +62,36 @@ module.exports = {
                     return next(createError(500));
             }
         }
+    },
+    getHourlyWeatherForcast: async (req, res, next) => {
+        let { code, date } = req.query;
+        if (!code || !date) {
+            return next(createError(400));
+        }
+
+        let time = date.split('T')[1];
+        date = date.split('T')[0];
+        if (!date || !time) {
+            return next(createError(400));
+        }
+
+        let hourlyWeatherList = [];
+        for (let i = 0; i < 24; ++i) {
+            hourlyWeatherList.push_back(
+                weatherService.getHourlyWeather(
+                    code,
+                    date,
+                    time,
+                    dateUtils.format24
+                )
+            );
+            let { next_date, next_time } = dateUtils.getNextHour(date, time);
+            date = next_date;
+            time = next_time;
+        }
+        return res.status(statusCode.OK).json({
+            hourlyWeatherList,
+            message: '시간 별 날씨 조회 성공'
+        });
     }
 };

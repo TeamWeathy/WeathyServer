@@ -6,6 +6,7 @@ const {
     isValidToken,
     refreshTokenOfUser
 } = require('../../services/tokenService');
+const exception = require('../../modules/exception');
 
 let originalTokenValue;
 
@@ -25,12 +26,18 @@ describe('tokenService test', function () {
     describe('isValidTokenById Test', function () {
         it('check valid token by id', async () => {
             assert.ok(await isValidTokenById(1, '1:aa'));
+            assert.ok(async () => {
+                await isValidTokenById(1, '1:a');
+            }, exception.MISMATCH_TOKEN);
         });
     });
 
     describe('isValidToken test', function () {
         it('check valild token', async () => {
             assert.ok(await isValidToken('1:aa'));
+            assert.ok(async () => {
+                await isValidToken('1:a');
+            }, exception.MISMATCH_TOKEN);
         });
     });
 

@@ -6,6 +6,7 @@ module.exports = {
 
     // USER
     NO_USER: 'NO_USER',
+    ALREADY_USER: 'ALREADY_USER',
 
     // REQUEST
     BAD_REQUEST: 'BAD_REQUEST',

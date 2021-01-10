@@ -13,6 +13,10 @@ module.exports = (sequelize, DataTypes) => {
             temperature: {
                 type: DataTypes.INTEGER,
                 allowNull: false
+            },
+            pop: {
+                type: DataTypes.INTEGER,
+                allowNull: false
             }
         },
         {

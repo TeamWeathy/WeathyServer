@@ -1,6 +1,6 @@
-const cryptoRandomString = require('crypto-random-string');
 const dayjs = require('dayjs');
 const { Token } = require('../models');
+const { generateToken, isUserOwnerOfToken } = require('../utils/tokenUtils');
 const exception = require('../modules/exception');
 
 const TOKEN_EXPIRES_IN_HOURS = 1; // 토큰 유효 기간 (100일)
@@ -31,17 +31,25 @@ const getUserIdByToken = async (token) => {
     }
 };
 
-const generateToken = () => {
-    return cryptoRandomString({ length: 30, type: 'alphanumeric' });
+const isValidToken = async (token) => {
+    const id = await getUserIdByToken(token);
+    return id == token.split(':')[0];
 };
 
 module.exports = {
-    isValidToken: async (user_id, token) => {
+    isValidTokenById: async (user_id, token) => {
         const id = await getUserIdByToken(token);
-        return id === user_id && token.split(':')[0] == user_id;
+        return id == user_id && token.split(':')[0] == user_id;
+    },
+    validateTokenWithUserId: async (userId, token) => {
+        if (!(await isValidToken(token))) {
+            throw Error(exception.INVALID_TOKEN);
+        } else if (!isUserOwnerOfToken(userId, token)) {
+            throw Error(exception.MISMATCH_TOKEN);
+        }
     },
     refreshTokenOfUser: async (user_id) => {
-        const token = user_id + ':' + generateToken();
+        const token = generateToken(user_id);
         // Sequalizer에서 Token 업데이트 하는 코드 추가
         await Token.update({ token: token }, { where: { user_id: user_id } });
         return token;

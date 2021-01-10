@@ -5,7 +5,7 @@ const cookieParser = require('cookie-parser');
 const morgan = require('morgan');
 
 const indexRouter = require('./routes/index');
-const authRouter = require('/routes/auth');
+const authRouter = require('./routes/auth');
 const usersRouter = require('./routes/users');
 const { swaggerUi, specs } = require('./modules/swagger');
 

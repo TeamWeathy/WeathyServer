@@ -15,9 +15,7 @@ module.exports = {
         }
 
         try {
-            if (!tokenService.isValidToken(token)) {
-                throw Error(exception.INVALID_TOKEN);
-            }
+            tokenService.validateTokenWithUserId(userId, token);
             const validCalendarOverviewList = await calendarService.getValidCalendarOverviewList(
                 userId,
                 start,
@@ -46,6 +44,7 @@ module.exports = {
         } catch (error) {
             switch (error.message) {
                 case exception.INVALID_TOKEN:
+                case exception.MISMATCH_TOKEN:
                     return next(createError(401));
                 default:
                     return next(createError(500));

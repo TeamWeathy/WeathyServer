@@ -101,8 +101,8 @@ module.exports = {
 
         let dailyWeatherList = [];
         for (let i = 0; i < 7; ++i) {
-            dailyWeatherList.push_back(
-                weatherService.getDailyWeather(code, date)
+            dailyWeatherList.push(
+                await weatherService.getDailyWeather(code, date)
             );
             date = dateUtils.getNextDay(date);
         }
@@ -123,15 +123,21 @@ module.exports = {
         }
 
         try {
-            let extraWeather = weatherService.getExtraDailyWeather(code, date);
-            return res.status(statusCode.ok).json({
+            let extraWeather = await weatherService.getExtraDailyWeather(
+                code,
+                date
+            );
+            return res.status(statusCode.OK).json({
                 extraWeather,
                 message: '상세 날씨 조회 성공'
             });
         } catch (error) {
             switch (error.message) {
                 case exception.NO_DATA:
-                    return next(createError(204));
+                    return res.status(statusCode.NO_CONTENT).json({
+                        extraWeather: null,
+                        message: '날씨 정보를 찾을 수 없음'
+                    });
                 default:
                     return next(createError(400));
             }
@@ -150,7 +156,7 @@ module.exports = {
         }
 
         try {
-            const overviewWeatherList = weatherService.getOverviewWeathers(
+            const overviewWeatherList = await weatherService.getOverviewWeathers(
                 keyword,
                 date,
                 time,

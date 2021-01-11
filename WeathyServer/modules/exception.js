@@ -1,4 +1,7 @@
 module.exports = {
+    // COMMON
+    NO_DATA: 'NO_DATA',
+
     // TOKEN
     EXPIRED_TOKEN: 'EXPIRED_TOKEN',
     INVALID_TOKEN: 'INVALID_TOKEN',
@@ -8,9 +11,12 @@ module.exports = {
     NO_USER: 'NO_USER',
     ALREADY_USER: 'ALREADY_USER',
 
+    // LOCATION
+    INVALID_LOCATION: 'INVALID_LOCATION',
+
     // REQUEST
     BAD_REQUEST: 'BAD_REQUEST',
 
     // SERVER
-    SERVER_ERROR: 'SERVER_ERROR'
+    SERVER_ERROR: 'SERVER_ ERROR'
 };

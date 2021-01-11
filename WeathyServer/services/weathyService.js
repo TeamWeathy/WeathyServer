@@ -10,6 +10,7 @@ const {
 } = require('../models');
 const locationService = require('./locationService');
 const weatherService = require('./weatherService');
+const clothesService = require('./clothesService');
 const exception = require('../modules/exception');
 
 function getConditionPoint(candidate, todayWeather) {
@@ -125,14 +126,15 @@ function getSuitableWeathers(todayWeather, weathies) {
 }
 
 async function loadWeatherOnDate(code, date) {
-    const { temperature: todayTemp } = await weatherService.getDailyWeather(
-        code,
-        date
-    );
+    const dailyWeather = await weatherService.getDailyWeather(code, date);
+    const dailyClimateId = await weatherService.getDailyClimateId(code, date);
 
-    const {
-        climateId: todayClimateId
-    } = await weatherService.getDailyClimateId(code, date);
+    if (!dailyWeather || !dailyClimateId) {
+        return null;
+    }
+    const { temperature: todayTemp } = dailyWeather;
+
+    const { climateId: todayClimateId } = dailyClimateId;
 
     if (!todayTemp || !todayClimateId) {
         return null;
@@ -146,9 +148,11 @@ async function loadWeatherOnDate(code, date) {
 
 async function getSimilarDate(code, date, candidates) {
     const todayWeather = await loadWeatherOnDate(code, date); //현재 지역의 날씨 로드
+
     if (!todayWeather) {
         return null;
     }
+
     const candidatesOfSuitableCase = getSuitableWeathers(
         todayWeather,
         candidates
@@ -192,13 +196,13 @@ async function loadWeathiesInSixtyDays(date, userId) {
 
 async function getRecommendedWeathy(code, date, userId) {
     const candidates = await loadWeathiesInSixtyDays(date, userId);
-    const similarDate = await getSimilarDate(code, date, candidates);
-
-    if (!similarDate) {
+    const mostSimilarDate = await getSimilarDate(code, date, candidates);
+    console.log('ERRR');
+    if (!mostSimilarDate) {
         return null;
     }
 
-    const recommendedWeathy = await this.getWeathy(similarDate, userId);
+    const recommendedWeathy = await this.getWeathy(mostSimilarDate, userId);
 
     return recommendedWeathy;
 }
@@ -230,7 +234,6 @@ async function getWeathy(date, userId) {
         return null;
     }
 
-    const updatedTime = dayjs(weathy.updatedAt);
     const { location_id: code } = weathy.DailyWeather;
 
     const dailyWeather = await weatherService.getDailyWeather(code, date);
@@ -250,6 +253,8 @@ async function getWeathy(date, userId) {
         return null;
     }
 
+    const closet = await clothesService.getWeathyCloset(weathy.id);
+
     return {
         weathy: {
             dailyWeather,
@@ -257,7 +262,7 @@ async function getWeathy(date, userId) {
                 climate: hourlyWeather.climate,
                 pop: hourlyWeather.pop
             },
-            closet: {},
+            closet,
             weathyId: weathy.id,
             stampId: weathy.emoji_id,
             feedback: weathy.description
@@ -270,7 +275,7 @@ async function createWeathy(
     clothes,
     stampId,
     userId,
-    feedback
+    feedback = ''
 ) {
     const t = await sequelize.transaction();
 
@@ -296,6 +301,7 @@ async function createWeathy(
         }
 
         await t.commit();
+        return weathy.id;
     } catch (err) {
         await t.rollback();
 
@@ -318,7 +324,7 @@ async function deleteWeathy(weathyId, userId) {
 
         return deletedWeathy;
     } catch (err) {
-        console.log(err);
+        throw Error(exception.SERVER_ERROR);
     }
 }
 

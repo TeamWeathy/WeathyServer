@@ -109,6 +109,7 @@ module.exports = {
         }
         return overviewWeatherList;
     },
+
     getExtraDailyWeather: async (code, date) => {
         const dailyWeather = await DailyWeather.findOne({
             where: { location_id: code, date: date }

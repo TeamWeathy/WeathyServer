@@ -236,9 +236,7 @@ module.exports = {
                 userId
             );
 
-            if (!deletedWeathy) {
-                return res.status(sc.NO_CONTENTS).json({});
-            }
+            if (!deletedWeathy) return res.status(sc.NO_CONTENTS).json({});
 
             return res.status(sc.OK).json({
                 message: '웨디 기록 삭제 성공'

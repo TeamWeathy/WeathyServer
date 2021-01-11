@@ -13,7 +13,7 @@ const weatherService = require('./weatherService');
 const clothesService = require('./clothesService');
 const exception = require('../modules/exception');
 
-function getConditionPoint(candidate, todayWeather) {
+const calculateConditionPoint = (candidate, todayWeather) => {
     const { todayTemp, todayClimateId } = todayWeather;
     const { minTemp: todayMinTemp, maxTemp: todayMaxTemp } = todayTemp;
     const {
@@ -33,9 +33,9 @@ function getConditionPoint(candidate, todayWeather) {
     const condition3 = todayClimateId % 100 === pastClimateId % 100 ? 1 : 0;
 
     return condition1 + condition2 + condition3;
-}
+};
 
-async function getWeathyOnDate(date, userId) {
+const getWeathyOnDate = async (date, userId) => {
     const weathy = await Weathy.findOne({
         include: [
             {
@@ -59,9 +59,9 @@ async function getWeathyOnDate(date, userId) {
     });
 
     return weathy;
-}
+};
 
-function selectBestDate(todayWeather, candidates) {
+const selectBestDate = (todayWeather, candidates) => {
     const SUITABLE_STAMP_ID = 3;
 
     let weathy = {
@@ -70,7 +70,7 @@ function selectBestDate(todayWeather, candidates) {
     };
 
     for (let candidate of candidates) {
-        let point = getConditionPoint(candidate, todayWeather);
+        let point = calculateConditionPoint(candidate, todayWeather);
 
         //init
         if (!weathy.recommend) {
@@ -88,14 +88,13 @@ function selectBestDate(todayWeather, candidates) {
             weathy.recommend = candidate;
         }
     }
-    if (!weathy.recommend) {
-        return null;
-    }
+
+    if (!weathy.recommend) return null;
 
     return weathy.recommend.DailyWeather.date;
-}
+};
 
-function getSuitableWeathers(todayWeather, weathies) {
+const getSuitableWeathers = (todayWeather, weathies) => {
     const { todayTemp } = todayWeather;
     const { minTemp: todayMinTemp, maxTemp: todayMaxTemp } = todayTemp;
     const weathyCase = {
@@ -108,50 +107,40 @@ function getSuitableWeathers(todayWeather, weathies) {
             temperature_min: pastMinTemp,
             temperature_max: pastMaxTemp
         } = w.DailyWeather;
+
         const maxTempPoint = Math.abs(todayMaxTemp - pastMaxTemp);
         const minTempPoint = Math.abs(todayMinTemp - pastMinTemp);
 
-        if (maxTempPoint <= 2 && minTempPoint <= 2) {
-            weathyCase[1].push(w);
-        } else if (maxTempPoint <= 2 || minTempPoint <= 2) {
-            weathyCase[2].push(w);
-        }
+        if (maxTempPoint <= 2 && minTempPoint <= 2) weathyCase[1].push(w);
+        else if (maxTempPoint <= 2 || minTempPoint <= 2) weathyCase[2].push(w);
     }
 
-    if (weathyCase[1].length !== 0) {
-        return weathyCase[1];
-    }
+    if (weathyCase[1].length !== 0) return weathyCase[1];
 
     return weathyCase[2];
-}
+};
 
-async function loadWeatherOnDate(code, date) {
+const loadWeatherOnDate = async (code, date) => {
     const dailyWeather = await weatherService.getDailyWeather(code, date);
     const dailyClimateId = await weatherService.getDailyClimateId(code, date);
 
-    if (!dailyWeather || !dailyClimateId) {
-        return null;
-    }
-    const { temperature: todayTemp } = dailyWeather;
+    if (!dailyWeather || !dailyClimateId) return null;
 
+    const { temperature: todayTemp } = dailyWeather;
     const { climateId: todayClimateId } = dailyClimateId;
 
-    if (!todayTemp || !todayClimateId) {
-        return null;
-    }
+    if (!todayTemp || !todayClimateId) return null;
 
     return {
         todayTemp,
         todayClimateId
     };
-}
+};
 
-async function getSimilarDate(code, date, candidates) {
+const getMostSimilarDate = async (code, date, candidates) => {
     const todayWeather = await loadWeatherOnDate(code, date); //현재 지역의 날씨 로드
 
-    if (!todayWeather) {
-        return null;
-    }
+    if (!todayWeather) return null;
 
     const candidatesOfSuitableCase = getSuitableWeathers(
         todayWeather,
@@ -159,9 +148,9 @@ async function getSimilarDate(code, date, candidates) {
     ); //적합한 case의 weathers 가져옴
 
     return selectBestDate(todayWeather, candidatesOfSuitableCase);
-}
+};
 
-async function loadWeathiesInSixtyDays(date, userId) {
+const loadWeathiesInSixtyDays = async (date, userId) => {
     const sixtyAgo = dayjs(date).subtract(60, 'day').format('YYYY-MM-DD');
 
     const weathies = await Weathy.findAll({
@@ -192,22 +181,20 @@ async function loadWeathiesInSixtyDays(date, userId) {
     });
 
     return weathies;
-}
+};
 
-async function getRecommendedWeathy(code, date, userId) {
+const getRecommendedWeathy = async (code, date, userId) => {
     const candidates = await loadWeathiesInSixtyDays(date, userId);
-    const mostSimilarDate = await getSimilarDate(code, date, candidates);
-    console.log('ERRR');
-    if (!mostSimilarDate) {
-        return null;
-    }
+    const mostSimilarDate = await getMostSimilarDate(code, date, candidates);
 
-    const recommendedWeathy = await this.getWeathy(mostSimilarDate, userId);
+    if (!mostSimilarDate) return null;
+
+    const recommendedWeathy = await getWeathy(mostSimilarDate, userId);
 
     return recommendedWeathy;
-}
+};
 
-async function checkOwnerClothes(clothes, userId) {
+const checkOwnerClothes = async (clothes, userId) => {
     const clothesIdSet = new Set();
 
     const clothesList = await Clothes.findAll({
@@ -216,26 +203,23 @@ async function checkOwnerClothes(clothes, userId) {
         },
         attributes: ['id']
     });
+
     for (let c of clothesList) {
         clothesIdSet.add(c.id);
     }
-
     for (let c of clothes) {
         if (!clothesIdSet.has(c)) return false;
     }
 
     return true;
-}
+};
 
-async function getWeathy(date, userId) {
+const getWeathy = async (date, userId) => {
     const weathy = await getWeathyOnDate(date, userId);
 
-    if (!weathy) {
-        return null;
-    }
+    if (!weathy) return null;
 
     const { location_id: code } = weathy.DailyWeather;
-
     const dailyWeather = await weatherService.getDailyWeather(code, date);
     const hourlyWeather = await weatherService.getHourlyWeather(
         code,
@@ -249,9 +233,7 @@ async function getWeathy(date, userId) {
     weathy.dailyWeather = dailyWeather;
     weathy.hourlyWeather = hourlyWeather;
 
-    if (!hourlyWeather) {
-        return null;
-    }
+    if (!hourlyWeather) return null;
 
     const closet = await clothesService.getWeathyCloset(weathy.id);
 
@@ -268,15 +250,15 @@ async function getWeathy(date, userId) {
             feedback: weathy.description
         }
     };
-}
+};
 
-async function createWeathy(
+const createWeathy = async (
     dailyWeatherId,
     clothes,
     stampId,
     userId,
     feedback = ''
-) {
+) => {
     const t = await sequelize.transaction();
 
     try {
@@ -311,9 +293,9 @@ async function createWeathy(
 
         throw Error(exception.SERVER_ERROR);
     }
-}
+};
 
-async function deleteWeathy(weathyId, userId) {
+const deleteWeathy = async (weathyId, userId) => {
     try {
         const deletedWeathy = await Weathy.destroy({
             where: {
@@ -326,16 +308,16 @@ async function deleteWeathy(weathyId, userId) {
     } catch (err) {
         throw Error(exception.SERVER_ERROR);
     }
-}
+};
 
-async function modifyWeathy(
+const modifyWeathy = async (
     weathyId,
     userId,
     code,
     clothes,
     stampId,
     feedback
-) {
+) => {
     const t = await sequelize.transaction();
 
     try {
@@ -356,9 +338,7 @@ async function modifyWeathy(
             { transaction: t }
         );
 
-        if (!target) {
-            return null;
-        }
+        if (!target) return null;
 
         const dailyWeatherDate = target.DailyWeather.date;
         const dailyWeather = await DailyWeather.findOne(
@@ -371,9 +351,7 @@ async function modifyWeathy(
             { transaction: t }
         );
 
-        if (!dailyWeather) {
-            throw Error(exception.NO_DAILY_WEATHER);
-        }
+        if (!dailyWeather) throw Error(exception.NO_DAILY_WEATHER);
 
         await Weathy.update(
             {
@@ -419,7 +397,7 @@ async function modifyWeathy(
         }
         throw Error(exception.SERVER_ERROR);
     }
-}
+};
 
 module.exports = {
     getRecommendedWeathy,

@@ -49,5 +49,12 @@ module.exports = {
         // Sequalizer에서 Token 업데이트 하는 코드 추가
         await Token.update({ token: token }, { where: { user_id: user_id } });
         return token;
+    },
+    createTokenOfUser: async (user_id) => {
+        const token = user_id + ':' + generateToken();
+        await Token.create({
+            user_id: user_id,
+            token: token
+        });
     }
 };

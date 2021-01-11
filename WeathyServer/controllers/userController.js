@@ -13,7 +13,7 @@ module.exports = {
 
         try {
             const user = await userService.createUserByUuid(uuid, nickname);
-            const token = await tokenService.refreshTokenOfUser(user.id);
+            const token = await tokenService.createTokenOfUser(user.id);
 
             return res.status(statusCode.OK).json({
                 user: {

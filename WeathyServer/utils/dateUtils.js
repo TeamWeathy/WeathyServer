@@ -9,7 +9,6 @@ const day_of_week = [
 ];
 
 const formatDate = (d) => {
-    console.log(d.getMonth());
     let month = '' + (d.getMonth() + 1);
     let day = '' + d.getDate();
     const year = d.getFullYear();

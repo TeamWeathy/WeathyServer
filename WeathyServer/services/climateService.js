@@ -38,7 +38,6 @@ const getWeatherGroup = (climate_id, temperature) => {
 
 const getDescription = async (climate_id, temperature) => {
     const weather_group = await getWeatherGroup(climate_id, temperature);
-    console.log('weather_group: ' + weather_group);
     const climateMessages = await ClimateMessage.findAll({
         where: { weather_group: weather_group }
     });

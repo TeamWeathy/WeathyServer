@@ -10,12 +10,15 @@ describe('logger test', function () {
         logger = require('../../modules/logger');
     });
     describe('production mode test', () => {
-        let prev_node_env = process.env.NODE_ENV;
         before('set NODE_ENV to production', () => {
             process.env.NODE_ENV = 'production';
         });
         after('reset NODE_ENV', () => {
-            process.env.NODE_ENV = prev_node_env;
+            if (!prev_node_env) {
+                delete process.env.NODE_ENV;
+            } else {
+                process.env.NODE_ENV = prev_node_env;
+            }
         });
         it('production mode not logs to console', () => {
             for (let i = 0; i < logger.transports.length; ++i) {
@@ -30,7 +33,11 @@ describe('logger test', function () {
             process.env.NODE_ENV = 'development';
         });
         after('reset NODE_ENV', () => {
-            process.env.NODE_ENV = prev_node_env;
+            if (!prev_node_env) {
+                delete process.env.NODE_ENV;
+            } else {
+                process.env.NODE_ENV = prev_node_env;
+            }
         });
         it('development mode logs to console', () => {
             let cnt_console_logger = 0;

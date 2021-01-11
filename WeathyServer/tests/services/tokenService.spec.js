@@ -7,7 +7,6 @@ const {
     validateTokenWithUserId,
     refreshTokenOfUser
 } = require('../../services/tokenService');
-const exception = require('../../modules/exception');
 
 let originalTokenValue;
 
@@ -24,7 +23,7 @@ describe('tokenService test', function () {
             { where: { user_id: 1 } }
         );
     });
-    
+
     describe('isValidTokenById Test', function () {
         it('check valid token by id', async () => {
             assert.ok(await isValidTokenById(1, '1:aa'));

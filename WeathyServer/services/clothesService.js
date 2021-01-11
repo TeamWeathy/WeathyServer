@@ -93,34 +93,45 @@ module.exports = {
             throw Error(exception.MISMATCH_TOKEN);
         } else {
             for (const clothes of clothesList) {
-                await Clothes.update(
-                    { is_deleted: 1 },
-                    { where: { id: clothes } }
-                );
-            }
-
-            // getClothesByUserId 와 동일. 어떻게 써먹을 수 있을까요?ㅠㅠ
-            const returnCloset = new Object();
-            const clothesCategories = await ClothesCategory.findAll();
-            for (const category of clothesCategories) {
-                const tempCloset = await Clothes.findAll({
-                    where: {
-                        user_id: userId,
-                        category_id: category.id,
-                        is_deleted: 0
-                    }
+                const tempClothes = await Clothes.findOne({
+                    where: { id: clothes }
                 });
-                const tempClothesList = new Array();
-                await tempCloset.forEach((element) => {
-                    const tempClothes = new Object();
-                    tempClothes.id = element.user_id;
-                    tempClothes.categoryId = element.category_id;
-                    tempClothes.name = element.name;
-                    tempClothesList.push(tempClothes);
-                });
-                returnCloset[category.name] = tempClothesList;
+                if (tempClothes === null) {
+                    // 없는 옷
+                    throw Error(exception.NO_CLOTHES);
+                } else if (tempClothes.user_id != userId) {
+                    // 자기 옷이 아님
+                    throw Error(exception.NOT_AUTHORIZED_CLOTHES);
+                } else {
+                    await Clothes.update(
+                        { is_deleted: 1 },
+                        { where: { id: clothes } }
+                    );
+                }
             }
-            return returnCloset;
         }
+
+        // getClothesByUserId 와 동일. 어떻게 써먹을 수 있을까요?ㅠㅠ
+        const returnCloset = new Object();
+        const clothesCategories = await ClothesCategory.findAll();
+        for (const category of clothesCategories) {
+            const tempCloset = await Clothes.findAll({
+                where: {
+                    user_id: userId,
+                    category_id: category.id,
+                    is_deleted: 0
+                }
+            });
+            const tempClothesList = new Array();
+            await tempCloset.forEach((element) => {
+                const tempClothes = new Object();
+                tempClothes.id = element.user_id;
+                tempClothes.categoryId = element.category_id;
+                tempClothes.name = element.name;
+                tempClothesList.push(tempClothes);
+            });
+            returnCloset[category.name] = tempClothesList;
+        }
+        return returnCloset;
     }
 };

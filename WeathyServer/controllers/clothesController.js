@@ -94,8 +94,11 @@ module.exports = {
                 case exception.MISMATCH_TOKEN:
                     next(createError(401));
                     break;
-                case exception.SERVER_ERROR:
-                    next(createError(500));
+                case exception.NO_CLOTHES:
+                    next(createError(400));
+                    break;
+                case exception.NOT_AUTHORIZED_CLOTHES:
+                    next(createError(403));
                     break;
                 default:
                     console.log(error.message);

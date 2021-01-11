@@ -71,15 +71,15 @@ module.exports = {
 
         let hourlyWeatherList = [];
         for (let i = 0; i < 24; ++i) {
-            hourlyWeatherList.push_back(
-                weatherService.getHourlyWeather(
+            hourlyWeatherList.push(
+                await weatherService.getHourlyWeather(
                     code,
                     date,
                     time,
                     dateUtils.format24
                 )
             );
-            let { next_date, next_time } = dateUtils.getNextHour(date, time);
+            const { next_date, next_time } = dateUtils.getNextHour(date, time);
             date = next_date;
             time = next_time;
         }

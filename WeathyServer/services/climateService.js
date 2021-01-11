@@ -17,6 +17,7 @@ const getTemperatureLevel = (temperature) => {
 };
 
 const getWeatherGroup = (climate_id, temperature) => {
+    climate_id %= 100;
     if (climate_id == 1) {
         return getTemperatureLevel(temperature);
     } else if (climate_id == 2 || climate_id == 3) {

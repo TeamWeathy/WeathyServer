@@ -1,6 +1,7 @@
 const { Clothes, ClothesCategory } = require('../models');
 const exception = require('../modules/exception');
 const { isValidTokenById } = require('./tokenService');
+const { Op } = require('sequelize');
 
 async function getClothesByUserId(token, userId) {
     // token과 userId로 valid한지 체크하고, clothes 가져옴
@@ -47,7 +48,6 @@ async function addClothesByUserId(token, userId, category, name) {
             where: { user_id: userId, category_id: category, name: name }
         });
 
-        const returnClothesList = new Array();
         if (alreadyClothes == null) {
             await Clothes.create({
                 user_id: userId,
@@ -74,14 +74,16 @@ async function addClothesByUserId(token, userId, category, name) {
         const tempCloset = await Clothes.findAll({
             where: { user_id: userId, category_id: category, is_deleted: 0 }
         });
-        await tempCloset.forEach((element) => {
-            const tempClothes = new Object();
-            tempClothes.id = element.user_id;
-            tempClothes.categoryId = element.category_id;
-            tempClothes.name = element.name;
-            returnClothesList.push(tempClothes);
-        });
 
+        const returnClothesList = new Array();
+
+        await tempCloset.forEach((element) => {
+            returnClothesList.push({
+                id: element.user_id,
+                categoryId: element.category_id,
+                name: element.name
+            });
+        });
         return returnClothesList;
     }
 }
@@ -93,6 +95,20 @@ async function deleteClothesByUserId(token, userId, clothesList) {
         // 토큰이 맞지 않음. 잘못된 요청
         throw Error(exception.MISMATCH_TOKEN);
     } else {
+        await Clothes.update(
+            {
+                is_deleted: 1
+            },
+            {
+                where: {
+                    id: {
+                        [Op.in]: clothesList
+                    }
+                }
+            }
+        );
+
+        /*
         for (const clothes of clothesList) {
             const tempClothes = await Clothes.findOne({
                 where: { id: clothes, is_deleted: 0 }
@@ -110,6 +126,7 @@ async function deleteClothesByUserId(token, userId, clothesList) {
                 );
             }
         }
+        */
     }
 
     const returnCloset = await getClothesByUserId(token, userId);

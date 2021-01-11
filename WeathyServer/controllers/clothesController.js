@@ -91,6 +91,7 @@ module.exports = {
                 message: '옷 삭제 성공'
             });
         } catch (error) {
+            console.log(error.message);
             switch (error.message) {
                 case exception.INVALID_TOKEN:
                 case exception.EXPIRED_TOKEN:

@@ -3,11 +3,16 @@ const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const morgan = require('morgan');
+const sc = require('./modules/statusCode');
 
 const indexRouter = require('./routes/index');
 const authRouter = require('./routes/auth');
 const usersRouter = require('./routes/users');
+const weathyRouter = require('./routes/weathy');
+
 const { swaggerUi, specs } = require('./modules/swagger');
+const exception = require('./modules/exception');
+const logger = require('winston');
 
 const app = express();
 
@@ -25,6 +30,8 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 app.use('/', indexRouter);
 app.use('/auth', authRouter);
 app.use('/users', usersRouter);
+app.use('/weathy', weathyRouter);
+// app.use()
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -32,14 +39,19 @@ app.use(function (req, res, next) {
 });
 
 // error handler
-app.use(function (err, req, res) {
+app.use(function (err, req, res, next) {
     // set locals, only providing error in development
-    res.locals.message = err.message;
-    res.locals.error = req.app.get('env') === 'development' ? err : {};
-
+    logger.error(err.stack);
+    if (err.status === exception.SERVER_ERROR) {
+        return res.status(exception.SERVER_ERROR);
+    } else if (err.status == 400) {
+        return res.status(400).json({
+            message: err.message
+        });
+    }
     // render the error page
     res.status(err.status || 500);
-    res.render('error');
+    // res.render('error');
 });
 
 module.exports = app;

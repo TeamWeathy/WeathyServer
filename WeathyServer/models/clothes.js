@@ -9,6 +9,10 @@ module.exports = (sequelize, DataTypes) => {
             name: {
                 type: DataTypes.STRING(45),
                 allowNull: false
+            },
+            is_deleted: {
+                type: DataTypes.TINYINT(1),
+                allowNull: false
             }
         },
         {

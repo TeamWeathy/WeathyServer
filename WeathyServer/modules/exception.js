@@ -7,6 +7,9 @@ module.exports = {
     // USER
     NO_USER: 'NO_USER',
 
+    // CLOTHES
+    ALREADY_CLOTHES: 'ALREADY_CLOTHES',
+
     // REQUEST
     BAD_REQUEST: 'BAD_REQUEST',
 

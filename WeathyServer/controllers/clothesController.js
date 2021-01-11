@@ -28,9 +28,6 @@ module.exports = {
                 case exception.MISMATCH_TOKEN:
                     next(createError(401));
                     break;
-                case exception.SERVER_ERROR:
-                    next(createError(500));
-                    break;
                 default:
                     console.log(error.message);
                     next(createError(500));
@@ -66,11 +63,7 @@ module.exports = {
                 case exception.MISMATCH_TOKEN:
                     next(createError(401));
                     break;
-                case exception.SERVER_ERROR:
-                    next(createError(500));
-                    break;
                 default:
-                    console.log(error.message);
                     next(createError(500));
             }
         }

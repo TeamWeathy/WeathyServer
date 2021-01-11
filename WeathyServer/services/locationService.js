@@ -24,8 +24,6 @@ module.exports = {
             throw Error(exception.SERVER_ERROR);
         }
 
-        console.log(response.documents);
-
         for (let i = 0; i < response.documents.length; ++i) {
             if (response.documents[i].region_type == 'H') {
                 return parseInt(response.documents[i].code / 100000) * 100000;

@@ -35,7 +35,7 @@ module.exports = {
         }
 
         try {
-            const overviewWeather = weatherService.getOverviewWeather(
+            const overviewWeather = await weatherService.getOverviewWeather(
                 code,
                 date,
                 time,

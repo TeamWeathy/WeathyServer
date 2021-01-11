@@ -9,6 +9,7 @@ module.exports = {
 
     // USER
     NO_USER: 'NO_USER',
+    ALREADY_USER: 'ALREADY_USER',
 
     // LOCATION
     INVALID_LOCATION: 'INVALID_LOCATION',

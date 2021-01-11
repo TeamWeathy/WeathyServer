@@ -14,12 +14,12 @@ module.exports = {
         try {
             const user = await userService.getUserByAccount(uuid);
             const token = await tokenService.refreshTokenOfUser(user.id);
-            const returnUser = {
-                id: user.id,
-                nickname: user.nickname
-            };
+
             return res.status(statusCode.OK).json({
-                user: returnUser,
+                user: {
+                    id: user.id,
+                    nickname: user.nickname
+                },
                 token: token,
                 message: '로그인 성공'
             });

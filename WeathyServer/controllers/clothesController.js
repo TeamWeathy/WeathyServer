@@ -63,6 +63,9 @@ module.exports = {
                 case exception.MISMATCH_TOKEN:
                     next(createError(401));
                     break;
+                case exception.ALREADY_CLOTHES:
+                    next(createError(400));
+                    break;
                 default:
                     next(createError(500));
             }

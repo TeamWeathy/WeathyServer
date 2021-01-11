@@ -3,7 +3,7 @@ const exception = require('../modules/exception');
 const { isValidTokenById } = require('./tokenService');
 
 module.exports = {
-    getClothesByUserId: async (token, userId) => {
+    getClothesByUserId: async function (token, userId) {
         // token과 userId로 valid한지 체크하고, clothes 가져옴
         const flag = await isValidTokenById(userId, token);
         if (!flag) {
@@ -94,7 +94,7 @@ module.exports = {
         } else {
             for (const clothes of clothesList) {
                 const tempClothes = await Clothes.findOne({
-                    where: { id: clothes }
+                    where: { id: clothes, is_deleted: 0 }
                 });
                 if (tempClothes === null) {
                     // 없는 옷

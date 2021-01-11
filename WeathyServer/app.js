@@ -7,6 +7,7 @@ const morgan = require('morgan');
 const indexRouter = require('./routes/index');
 const authRouter = require('./routes/auth');
 const usersRouter = require('./routes/users');
+const weatherRouter = require('./routes/weather');
 const { swaggerUi, specs } = require('./modules/swagger');
 
 const app = express();
@@ -25,6 +26,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 app.use('/', indexRouter);
 app.use('/auth', authRouter);
 app.use('/users', usersRouter);
+app.use('/weather', weatherRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

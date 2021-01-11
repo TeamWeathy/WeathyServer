@@ -54,7 +54,7 @@ module.exports = {
             day.setDate(day.getDate() + 1);
             time = 0;
         }
-        return { date: formatDate(day), time };
+        return { next_date: formatDate(day), next_time: time };
     },
     getNextDay: (date) => {
         let day = new Date(date);

@@ -57,7 +57,6 @@ const getHourlyWeather = async (code, date, hour, timeFormat) => {
     if (!hourlyWeather) {
         return null;
     }
-    console.log(hourlyWeather.climate_id + ' : ' + hourlyWeather.temperature);
     return {
         time: timeFormat(hourlyWeather.hour),
         temperature: hourlyWeather.temperature,

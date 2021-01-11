@@ -3,5 +3,6 @@ module.exports = {
     userService: require('./userService'),
     climateService: require('./climateService'),
     locationService: require('./locationService'),
-    weatherService: require('./weatherService')
+    weatherService: require('./weatherService'),
+    calendarService: require('./calendarService')
 };

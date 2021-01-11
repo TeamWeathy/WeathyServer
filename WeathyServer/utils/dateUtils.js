@@ -45,6 +45,7 @@ module.exports = {
             return '오전 ' + hour + '시';
         }
     },
+    formatDate,
     getNextHour: (date, time) => {
         let day = new Date(date);
         ++time;

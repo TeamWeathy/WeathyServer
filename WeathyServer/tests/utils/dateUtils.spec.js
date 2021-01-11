@@ -50,6 +50,13 @@ describe('dateUtils test', function () {
         });
     });
 
+    describe('formatDate test', function () {
+        it('formatDate returns YYYY-MM-DD formated string', function () {
+            const date = new Date('1999-01-01');
+            assert.ok(dateUtils.formatDate(date) == '1999-01-01');
+        });
+    });
+
     describe('getNextHour test', function () {
         it('getNextHour increase time', function () {
             const { next_date, next_time } = dateUtils.getNextHour(

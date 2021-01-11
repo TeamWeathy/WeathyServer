@@ -1,12 +1,12 @@
 const assert = require('assert');
 const dayjs = require('dayjs');
 const { Token } = require('../../models');
+const exception = require('../../modules/exception');
 const {
     isValidTokenById,
-    isValidToken,
+    validateTokenWithUserId,
     refreshTokenOfUser
 } = require('../../services/tokenService');
-const exception = require('../../modules/exception');
 
 let originalTokenValue;
 
@@ -23,6 +23,7 @@ describe('tokenService test', function () {
             { where: { user_id: 1 } }
         );
     });
+
     describe('isValidTokenById Test', function () {
         it('check valid token by id', async () => {
             assert.ok(await isValidTokenById(1, '1:aa'));
@@ -32,11 +33,20 @@ describe('tokenService test', function () {
         });
     });
 
-    describe('isValidToken test', function () {
-        it('check valild token', async () => {
-            assert.ok(await isValidToken('1:aa'));
-            assert.ok(async () => {
-                await isValidToken('1:a');
+    describe('validateTokenWithUserId test', function () {
+        it('validateTokenWithUserId success', async function () {
+            await assert.ok(async () => {
+                await validateTokenWithUserId(1, '1:aa');
+            }, exception.INVALID_TOKEN);
+        });
+        it('validateTokenWithUserId throw error if token invalid', async function () {
+            await assert.ok(async () => {
+                await validateTokenWithUserId(1, 'INVALID_TOKEN');
+            }, exception.INVALID_TOKEN);
+        });
+        it('validateTokenWithUserId throw error if token and user mismatched', async function () {
+            await assert.ok(async () => {
+                await validateTokenWithUserId(1, '1:invalidtoken');
             }, exception.MISMATCH_TOKEN);
         });
     });

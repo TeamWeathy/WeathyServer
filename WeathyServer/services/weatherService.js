@@ -133,13 +133,29 @@ module.exports = {
     },
     getDailyClimateId: async (code, date) => {
         const dailyWeather = await DailyWeather.findOne({
-            where: { location_id: code, date: date }
+            where: { location_id: code, date }
         });
         if (!dailyWeather) {
             return null;
         }
         return {
             climateId: dailyWeather.climate_id
+        };
+    },
+    getDailyWeatherId: async (code, date) => {
+        const dailyWeather = await DailyWeather.findOne({
+            where: {
+                location_id: code,
+                date
+            }
+        });
+
+        if (!dailyWeather) {
+            return null;
+        }
+
+        return {
+            dailyWeatherId: dailyWeather.id
         };
     }
 };

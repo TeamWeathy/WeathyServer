@@ -41,17 +41,11 @@ app.use(function (req, res, next) {
 // error handler
 app.use(function (err, req, res, next) {
     // set locals, only providing error in development
-    logger.error(err.stack);
-    if (err.status === exception.SERVER_ERROR) {
-        return res.status(exception.SERVER_ERROR);
-    } else if (err.status == 400) {
-        return res.status(400).json({
-            message: err.message
-        });
-    }
+
     // render the error page
-    res.status(err.status || 500);
-    // res.render('error');
+    res.status(err.status || 500).json({
+        message: err.message
+    });
 });
 
 module.exports = app;

@@ -1,11 +1,16 @@
 const dayjs = require('dayjs');
-const { Op, literal } = require('sequelize');
+const { Op, literal, UniqueConstraintError } = require('sequelize');
 const { format12 } = require('../utils/dateUtils');
-const { Weathy, DailyWeather } = require('../models');
-
+const {
+    Weathy,
+    DailyWeather,
+    sequelize,
+    WeathyClothes,
+    Clothes
+} = require('../models');
 const locationService = require('./locationService');
-
 const weatherService = require('./weatherService');
+const exception = require('../modules/exception');
 
 function getConditionPoint(candidate, todayWeather) {
     const { todayTemp, todayClimateId } = todayWeather;
@@ -24,7 +29,7 @@ function getConditionPoint(candidate, todayWeather) {
         (Math.abs(todayMaxTemp - todayMinTemp) -
             Math.abs(pastMaxTemp - pastMinTemp)) *
         2;
-    const condition3 = todayClimateId === pastClimateId ? 1 : 0;
+    const condition3 = todayClimateId % 100 === pastClimateId % 100 ? 1 : 0;
 
     return condition1 + condition2 + condition3;
 }
@@ -197,6 +202,27 @@ async function getRecommendedWeathy(code, date, userId) {
 
     return recommendedWeathy;
 }
+
+async function checkOwnerClothes(clothes, userId) {
+    const clothesIdSet = new Set();
+
+    const clothesList = await Clothes.findAll({
+        where: {
+            user_id: userId
+        },
+        attributes: ['id']
+    });
+    for (let c of clothesList) {
+        clothesIdSet.add(c.id);
+    }
+
+    for (let c of clothes) {
+        if (!clothesIdSet.has(c)) return false;
+    }
+
+    return true;
+}
+
 async function getWeathy(date, userId) {
     const weathy = await getWeathyOnDate(date, userId);
 
@@ -211,7 +237,7 @@ async function getWeathy(date, userId) {
     const hourlyWeather = await weatherService.getHourlyWeather(
         code,
         date,
-        updatedTime.hour(),
+        0,
         format12
     );
 
@@ -219,6 +245,10 @@ async function getWeathy(date, userId) {
 
     weathy.dailyWeather = dailyWeather;
     weathy.hourlyWeather = hourlyWeather;
+
+    if (!hourlyWeather) {
+        return null;
+    }
 
     return {
         weathy: {
@@ -228,13 +258,168 @@ async function getWeathy(date, userId) {
                 pop: hourlyWeather.pop
             },
             closet: {},
+            weathyId: weathy.id,
             stampId: weathy.emoji_id,
             feedback: weathy.description
         }
     };
 }
 
+async function createWeathy(
+    dailyWeatherId,
+    clothes,
+    stampId,
+    userId,
+    feedback
+) {
+    const t = await sequelize.transaction();
+
+    try {
+        const weathy = await Weathy.create(
+            {
+                user_id: userId,
+                dailyweather_id: dailyWeatherId,
+                emoji_id: stampId,
+                description: feedback
+            },
+            { transaction: t }
+        );
+
+        for (let c of clothes) {
+            await WeathyClothes.create(
+                {
+                    weathy_id: weathy.id,
+                    clothes_id: c
+                },
+                { transaction: t }
+            );
+        }
+
+        await t.commit();
+    } catch (err) {
+        await t.rollback();
+
+        if (err instanceof UniqueConstraintError) {
+            throw Error(exception.DUPLICATION_WEATHY);
+        }
+
+        throw Error(exception.SERVER_ERROR);
+    }
+}
+
+async function deleteWeathy(weathyId, userId) {
+    try {
+        const deletedWeathy = await Weathy.destroy({
+            where: {
+                user_id: userId,
+                id: weathyId
+            }
+        });
+
+        return deletedWeathy;
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+async function modifyWeathy(
+    weathyId,
+    userId,
+    code,
+    clothes,
+    stampId,
+    feedback
+) {
+    const t = await sequelize.transaction();
+
+    try {
+        const target = await Weathy.findOne(
+            {
+                include: [
+                    {
+                        model: DailyWeather,
+                        required: true,
+                        attributes: ['id', 'date']
+                    }
+                ],
+                where: {
+                    id: weathyId,
+                    user_id: userId
+                }
+            },
+            { transaction: t }
+        );
+
+        if (!target) {
+            return null;
+        }
+
+        const dailyWeatherDate = target.DailyWeather.date;
+        const dailyWeather = await DailyWeather.findOne(
+            {
+                where: {
+                    date: dailyWeatherDate,
+                    location_id: code
+                }
+            },
+            { transaction: t }
+        );
+
+        if (!dailyWeather) {
+            throw Error(exception.NO_DAILY_WEATHER);
+        }
+
+        await Weathy.update(
+            {
+                dailyweather_id: dailyWeather.id,
+                emoji_id: stampId,
+                description: feedback
+            },
+            {
+                where: {
+                    user_id: userId,
+                    id: weathyId
+                }
+            },
+            { transaction: t }
+        );
+
+        await WeathyClothes.destroy(
+            {
+                where: {
+                    weathy_id: weathyId
+                }
+            },
+            { transaction: t }
+        );
+
+        for (let c of clothes) {
+            await WeathyClothes.create(
+                {
+                    weathy_id: weathyId,
+                    clothes_id: c
+                },
+                { transaction: t }
+            );
+        }
+
+        await t.commit();
+        return true;
+    } catch (err) {
+        await t.rollback();
+
+        if (err.message === exception.NO_DAILY_WEATHER) {
+            throw Error(exception.NO_DAILY_WEATHER);
+        }
+        throw Error(exception.SERVER_ERROR);
+    }
+}
+
 module.exports = {
     getRecommendedWeathy,
-    getWeathy
+    getWeathy,
+    createWeathy,
+    deleteWeathy,
+    modifyWeathy,
+    checkOwnerClothes
 };

@@ -46,7 +46,7 @@ const tokenMiddleware = async (req, res, next) => {
             const userId = await getUserIdByToken(token);
             return userId;
         } catch (error) {
-            next(createError(sc.BAD_REQUEST));
+            next(createError(sc.BAD_REQUEST, 'Token Error'));
         }
     };
 

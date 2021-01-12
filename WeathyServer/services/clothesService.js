@@ -12,7 +12,7 @@ const setClothesForm = async () => {
 
     for (const c of clothesCategories) {
         closet[c.name] = {
-            id: c.id,
+            categoryId: c.id,
             clothes: []
         };
     }
@@ -84,7 +84,7 @@ async function getWeathyCloset(weathyId) {
             const clothesName = wc.Clothe.name;
 
             closet[categoryName].clothes.push({
-                categoryId: clothesId,
+                id: clothesId,
                 name: clothesName
             });
         }

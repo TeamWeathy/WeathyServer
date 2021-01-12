@@ -35,17 +35,20 @@ async function getClothesByUserId(token, userId) {
                     user_id: userId,
                     category_id: category.id,
                     is_deleted: 0
-                }
+                },
+                order: [['updated_at', 'DESC'],['id', 'DESC'] ]
             });
+            const temp = new Object();
+            temp.categoryId = category.id;
             const tempClothesList = new Array();
             await tempCloset.forEach((element) => {
                 const tempClothes = new Object();
-                tempClothes.id = element.user_id;
-                tempClothes.categoryId = element.category_id;
+                tempClothes.id = element.id;
                 tempClothes.name = element.name;
                 tempClothesList.push(tempClothes);
             });
-            returnCloset[category.name] = tempClothesList;
+            temp.clothes = tempClothesList;
+            returnCloset[category.name] = temp;
         }
 
         return returnCloset;
@@ -130,6 +133,7 @@ async function addClothesByUserId(token, userId, category, name) {
             );
         }
 
+        /*
         const tempCloset = await Clothes.findAll({
             where: { user_id: userId, category_id: category, is_deleted: 0 }
         });
@@ -138,12 +142,43 @@ async function addClothesByUserId(token, userId, category, name) {
 
         await tempCloset.forEach((element) => {
             returnClothesList.push({
-                id: element.user_id,
+                id: element.id,
                 categoryId: element.category_id,
                 name: element.name
             });
         });
         return returnClothesList;
+        */
+
+       const returnCloset = new Object();
+       const clothesCategories = await ClothesCategory.findAll();
+    
+       for (const tempCategory of clothesCategories) {
+           const tempCloset = await Clothes.findAll({
+               where: {
+                   user_id: userId,
+                   category_id: tempCategory.id,
+                   is_deleted: 0
+               },
+               order: [['updated_at', 'DESC'],['id', 'DESC'] ]
+           });
+           const temp = new Object();
+           temp.categoryId = tempCategory.id;
+           const tempClothesList = new Array();
+           await tempCloset.forEach((element) => {
+               const tempClothes = new Object();
+               tempClothes.id = element.id;
+               tempClothes.name = element.name;
+               tempClothesList.push(tempClothes);
+           });
+           if(tempCategory.id === category) {
+               temp.clothes = tempClothesList;
+           } else {
+               temp.clothes = [];
+           }
+           returnCloset[tempCategory.name] = temp;
+       }
+       return returnCloset;
     }
 }
 

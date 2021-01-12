@@ -4,8 +4,9 @@ const dayjs = require('dayjs');
 const { Token } = require('../models');
 const sc = require('./statusCode');
 const exception = require('./exception');
+const { generateToken } = require('../utils/tokenUtils');
 
-const TOKEN_EXPIRES_IN_HOURS = 1; // 토큰 유효 기간 (100일)
+const TOKEN_EXPIRES_IN_HOURS = 1; // 토큰 유효 기간 (1시간)
 
 //이런식 미들웨어로 변경 => 논의
 const checkTokenExpired = async (token) => {
@@ -34,6 +35,15 @@ const getUserIdByToken = async (token) => {
     }
 };
 
+const refreshTokenTimeOfUser = async (user_id) => {
+    // Sequalizer에서 Token (시간만) 업데이트 하는 코드
+    const userToken = await Token.findOne({ where: {user_id: user_id }});
+    const token = userToken.token;
+    const fakeToken = generateToken(user_id);
+    await Token.update({ token: fakeToken }, { where: { user_id: user_id } });
+    await Token.update({ token: token }, { where: { user_id: user_id }});
+}
+
 const tokenMiddleware = async (req, res, next) => {
     // read the token from header
     const token = req.headers['x-access-token'];
@@ -49,9 +59,11 @@ const tokenMiddleware = async (req, res, next) => {
             next(createError(sc.BAD_REQUEST, 'Token Error'));
         }
     };
+    
+    const userId = await getUserId(token);
+    req.userId = userId;
 
-    req.userId = await getUserId(token);
-
+    await refreshTokenTimeOfUser(userId);
     next();
 };
 

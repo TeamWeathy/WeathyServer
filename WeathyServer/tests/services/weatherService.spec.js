@@ -112,7 +112,7 @@ describe('weather service test', function () {
             assert.strictEqual(overviewWeatherList.length, 1);
             assertDailyWeather(overviewWeatherList[0].dailyWeather);
             assertHourlyWeather(overviewWeatherList[0].hourlyWeather);
-        });
+        }).timeout(15000);
         it('getOverviewWeathers returns empty list if not exists', async function () {
             const overviewWeatherList = await weatherService.getOverviewWeathers(
                 '김자현',

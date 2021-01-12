@@ -44,6 +44,15 @@ const refreshTokenTimeOfUser = async (user_id) => {
     await Token.update({ token: token }, { where: { user_id: user_id }});
 }
 
+const getUserId = async (token) => {
+       try {
+           const userId = await getUserIdByToken(token);
+           return userId;
+       } catch (error) {
+           throw Error(exception.INVALID_TOKEN);
+       }
+    };
+    
 const tokenMiddleware = async (req, res, next) => {
     // read the token from header
     const token = req.headers['x-access-token'];
@@ -51,19 +60,14 @@ const tokenMiddleware = async (req, res, next) => {
     if (!token) {
         next(createError(sc.BAD_REQUEST));
     }
-    const getUserId = async (token) => {
-        try {
-            const userId = await getUserIdByToken(token);
-            return userId;
-        } catch (error) {
-            next(createError(sc.BAD_REQUEST, 'Token Error'));
-        }
-    };
-    
-    const userId = await getUserId(token);
-    req.userId = userId;
-
-    await refreshTokenTimeOfUser(userId);
+  
+    try {
+        const userId = await getUserId(token);
+        req.userId = userId;
+        await refreshTokenTimeOfUser(userId);
+    } catch (error) {
+        next(createError(sc.BAD_REQUEST, 'Token Error'));
+    }
     next();
 };
 

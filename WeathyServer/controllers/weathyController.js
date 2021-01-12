@@ -197,9 +197,7 @@ module.exports = {
                 feedback
             );
 
-            if (!weathy) {
-                throw Error(exception.NO_AUTHORITY);
-            }
+            if (!weathy) throw Error(exception.NO_AUTHORITY);
 
             return res.status(sc.OK).json({
                 message: '웨디 기록 수정 완료'

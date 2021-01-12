@@ -12,6 +12,7 @@ const locationService = require('./locationService');
 const weatherService = require('./weatherService');
 const clothesService = require('./clothesService');
 const exception = require('../modules/exception');
+const { async } = require('crypto-random-string');
 
 const calculateConditionPoint = (candidate, todayWeather) => {
     const { todayTemp, todayClimateId } = todayWeather;
@@ -150,6 +151,29 @@ const getMostSimilarDate = async (code, date, candidates) => {
     return selectBestDate(todayWeather, candidatesOfSuitableCase);
 };
 
+const upsertWeathyClothes = async (clothes, weathyId, transaction) => {
+    const clothesDBForm = [];
+
+    await WeathyClothes.destroy(
+        {
+            where: {
+                weathy_id: weathyId
+            }
+        },
+        { transaction }
+    );
+
+    for (let c of clothes) {
+        clothesDBForm.push({
+            weathy_id: weathyId,
+
+            clothes_id: c
+        });
+    }
+
+    await WeathyClothes.bulkCreate(clothesDBForm, { transaction });
+};
+
 const loadWeathiesInSixtyDays = async (date, userId) => {
     const sixtyAgo = dayjs(date).subtract(60, 'day').format('YYYY-MM-DD');
 
@@ -214,6 +238,45 @@ const checkOwnerClothes = async (clothes, userId) => {
     return true;
 };
 
+const findDailyWeatherByWeathy = async (
+    weathyId,
+    code,
+    userId,
+    transaction
+) => {
+    const target = await Weathy.findOne(
+        {
+            include: [
+                {
+                    model: DailyWeather,
+                    required: true,
+                    attributes: ['id', 'date']
+                }
+            ],
+            where: {
+                id: weathyId,
+                user_id: userId
+            }
+        },
+        { transaction }
+    );
+
+    if (!target) return null;
+
+    const dailyWeatherDate = target.DailyWeather.date;
+    const dailyWeather = await DailyWeather.findOne(
+        {
+            where: {
+                date: dailyWeatherDate,
+                location_id: code
+            }
+        },
+        { transaction }
+    );
+
+    return dailyWeather;
+};
+
 const getWeathy = async (date, userId) => {
     const weathy = await getWeathyOnDate(date, userId);
 
@@ -259,7 +322,7 @@ const createWeathy = async (
     userId,
     feedback = ''
 ) => {
-    const t = await sequelize.transaction();
+    const transaction = await sequelize.transaction();
 
     try {
         const weathy = await Weathy.create(
@@ -269,23 +332,15 @@ const createWeathy = async (
                 emoji_id: stampId,
                 description: feedback
             },
-            { transaction: t }
+            { transaction }
         );
 
-        for (let c of clothes) {
-            await WeathyClothes.create(
-                {
-                    weathy_id: weathy.id,
-                    clothes_id: c
-                },
-                { transaction: t }
-            );
-        }
+        await upsertWeathyClothes(clothes, weathy.id, transaction);
 
-        await t.commit();
+        await transaction.commit();
         return weathy.id;
     } catch (err) {
-        await t.rollback();
+        await transaction.rollback();
 
         if (err instanceof UniqueConstraintError) {
             throw Error(exception.DUPLICATION_WEATHY);
@@ -318,42 +373,19 @@ const modifyWeathy = async (
     stampId,
     feedback
 ) => {
-    const t = await sequelize.transaction();
+    const transaction = await sequelize.transaction();
 
     try {
-        const target = await Weathy.findOne(
-            {
-                include: [
-                    {
-                        model: DailyWeather,
-                        required: true,
-                        attributes: ['id', 'date']
-                    }
-                ],
-                where: {
-                    id: weathyId,
-                    user_id: userId
-                }
-            },
-            { transaction: t }
-        );
-
-        if (!target) return null;
-
-        const dailyWeatherDate = target.DailyWeather.date;
-        const dailyWeather = await DailyWeather.findOne(
-            {
-                where: {
-                    date: dailyWeatherDate,
-                    location_id: code
-                }
-            },
-            { transaction: t }
+        const dailyWeather = await findDailyWeatherByWeathy(
+            weathyId,
+            code,
+            userId,
+            transaction
         );
 
         if (!dailyWeather) throw Error(exception.NO_DAILY_WEATHER);
 
-        await Weathy.update(
+        const isUpdated = await Weathy.update(
             {
                 dailyweather_id: dailyWeather.id,
                 emoji_id: stampId,
@@ -365,32 +397,16 @@ const modifyWeathy = async (
                     id: weathyId
                 }
             },
-            { transaction: t }
+            { transaction }
         );
 
-        await WeathyClothes.destroy(
-            {
-                where: {
-                    weathy_id: weathyId
-                }
-            },
-            { transaction: t }
-        );
+        await upsertWeathyClothes(clothes, weathyId, transaction);
 
-        for (let c of clothes) {
-            await WeathyClothes.create(
-                {
-                    weathy_id: weathyId,
-                    clothes_id: c
-                },
-                { transaction: t }
-            );
-        }
+        await transaction.commit();
 
-        await t.commit();
-        return true;
+        return isUpdated;
     } catch (err) {
-        await t.rollback();
+        await transaction.rollback();
 
         if (err.message === exception.NO_DAILY_WEATHER) {
             throw Error(exception.NO_DAILY_WEATHER);

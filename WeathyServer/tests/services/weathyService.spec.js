@@ -155,6 +155,7 @@ describe('weathy service test', function () {
         before('Create Weathy', async () => {
             weathyId = await weathyService.createWeathy(200, [5, 6], 3, userId);
         });
+
         after('Delete Weathy', async () => {
             await Weathy.destroy({
                 where: {
@@ -163,6 +164,7 @@ describe('weathy service test', function () {
                 paranoid: false
             });
         });
+
         it('modifyWeathy Success case test ', async function () {
             await weathyService.modifyWeathy(
                 weathyId,
@@ -186,7 +188,7 @@ describe('weathy service test', function () {
                     user_id: userId
                 }
             });
-            console.log('is', modifedWeathy);
+
             const result = await WeathyClothes.findAndCountAll({
                 where: {
                     weathy_id: weathyId

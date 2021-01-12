@@ -38,7 +38,7 @@ module.exports = {
         const { userId } = req.params;
         const { nickname } = req.body;
 
-        if (!userId || !nickname) {
+        if (!userId || !nickname || !reqToken) {
             next(createError(400));
         }
 

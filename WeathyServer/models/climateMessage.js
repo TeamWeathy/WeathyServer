@@ -1,21 +1,13 @@
 module.exports = (sequelize, DataTypes) => {
     return sequelize.define(
-        'HourlyWeathers',
+        'ClimateMessages',
         {
-            date: {
-                type: DataTypes.DATE,
-                allowNull: false
-            },
-            hour: {
+            weather_group: {
                 type: DataTypes.INTEGER,
                 allowNull: false
             },
-            temperature: {
-                type: DataTypes.INTEGER,
-                allowNull: false
-            },
-            pop: {
-                type: DataTypes.INTEGER,
+            description: {
+                type: DataTypes.STRING(100),
                 allowNull: false
             }
         },
@@ -26,7 +18,7 @@ module.exports = (sequelize, DataTypes) => {
             indexes: [
                 {
                     unique: true,
-                    fields: ['date', 'hour', 'location_id']
+                    fields: ['weather_group', 'description']
                 }
             ]
         }

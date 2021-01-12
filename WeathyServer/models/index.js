@@ -23,6 +23,7 @@ db.HourlyWeather = require('./hourlyWeather')(sequelize, Sequelize);
 db.DailyWeather = require('./dailyWeather')(sequelize, Sequelize);
 db.Location = require('./location')(sequelize, Sequelize);
 db.Climate = require('./climate')(sequelize, Sequelize);
+db.ClimateMessage = require('./climateMessage')(sequelize, Sequelize);
 db.User = require('./user')(sequelize, Sequelize);
 db.ClothesCategory = require('./category')(sequelize, Sequelize);
 db.Clothes = require('./clothes')(sequelize, Sequelize);

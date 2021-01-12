@@ -48,14 +48,13 @@ module.exports = {
                 userId,
                 nickname
             );
-            const token = reqToken;
 
             return res.status(statusCode.OK).json({
                 user: {
                     id: user.id,
                     nickname: user.nickname
                 },
-                token: token,
+                token: reqToken,
                 message: '유저 닉네임 변경 성공'
             });
         } catch (error) {

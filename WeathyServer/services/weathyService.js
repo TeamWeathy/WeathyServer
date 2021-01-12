@@ -28,10 +28,14 @@ const calculateConditionPoint = (candidate, todayWeather) => {
             Math.abs(todayMinTemp - pastMinTemp)) *
         3;
     const condition2 =
-        (Math.abs(todayMaxTemp - todayMinTemp) -
-            Math.abs(pastMaxTemp - pastMinTemp)) *
-        2;
+        Math.abs(
+            Math.abs(todayMaxTemp - todayMinTemp) -
+                Math.abs(pastMaxTemp - pastMinTemp)
+        ) * 2;
     const condition3 = todayClimateId % 100 === pastClimateId % 100 ? 1 : 0;
+
+    if (candidate.DailyWeather.date == '2023-12-13')
+        console.log(condition1 + condition2 + condition3, candidate);
 
     return condition1 + condition2 + condition3;
 };
@@ -287,7 +291,7 @@ const getWeathy = async (date, userId) => {
     const hourlyWeather = await weatherService.getHourlyWeather(
         code,
         date,
-        0,
+        12,
         format12
     );
 
@@ -310,7 +314,7 @@ const getWeathy = async (date, userId) => {
             closet,
             weathyId: weathy.id,
             stampId: weathy.emoji_id,
-            feedback: weathy.description
+            feedback: weathy.description || ''
         }
     };
 };

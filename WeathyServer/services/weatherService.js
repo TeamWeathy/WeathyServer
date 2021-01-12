@@ -39,6 +39,7 @@ const getDailyWeather = async (code, date) => {
     }
     return {
         date: {
+            year: dateUtils.getYear(dailyWeather.date),
             month: dateUtils.getMonth(dailyWeather.date),
             day: dateUtils.getDay(dailyWeather.date),
             dayOfWeek: dateUtils.getYoil(dailyWeather.date)

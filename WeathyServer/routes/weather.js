@@ -1,6 +1,6 @@
-var express = require('express');
-var router = express.Router();
-var weatherController = require('../controllers/weatherController');
+const express = require('express');
+const router = express.Router();
+const weatherController = require('../controllers/weatherController');
 
 router.get('/overview', weatherController.getWeatherByLocation);
 router.get('/forecast/hourly', weatherController.getHourlyWeatherForecast);

@@ -62,7 +62,6 @@ const tokenMiddleware = async (req, res, next) => {
     
     const userId = await getUserId(token);
     req.userId = userId;
-    console.log(userId);
 
     await refreshTokenTimeOfUser(userId);
     next();

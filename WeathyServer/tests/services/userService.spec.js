@@ -1,5 +1,5 @@
 const assert = require('assert');
-const { User, Token } = require('../../models');
+const { User, Token, Clothes } = require('../../models');
 const exception = require('../../modules/exception');
 const {
     getUserByAccount,
@@ -48,6 +48,8 @@ describe('userService test', function () {
             const secondUser = await User.findOne({ order: [['id', 'DESC']] });
             assert.ok(firstUser.id === secondUser.id);
             assert.ok(firstUser.nickname === secondUser.nickname);
+            const clothes = await Clothes.findOne({ where: { user_id: firstUser.id, name: '티셔츠' }});
+            assert.ok(clothes !== null);
         });
 
         it('if already uuid exists, exception ALRLEADY_USER', async () => {
@@ -57,6 +59,7 @@ describe('userService test', function () {
                 await createUserByUuid(uuid, nickname);
             }, exception.ALREADY_USER);
         });
+
     });
 
     let originalNickname;

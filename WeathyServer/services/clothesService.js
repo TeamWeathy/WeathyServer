@@ -166,35 +166,42 @@ async function deleteClothesByUserId(token, userId, clothesList) {
                 }
             }
         );
-
-        /*
-        for (const clothes of clothesList) {
-            const tempClothes = await Clothes.findOne({
-                where: { id: clothes, is_deleted: 0 }
-            });
-            if (tempClothes === null) {
-                // 없는 옷
-                throw Error(exception.NO_CLOTHES);
-            } else if (tempClothes.user_id != userId) {
-                // 자기 옷이 아님
-                throw Error(exception.NOT_AUTHORIZED_CLOTHES);
-            } else {
-                await Clothes.update(
-                    { is_deleted: 1 },
-                    { where: { id: clothes } }
-                );
-            }
-        }
-        */
     }
 
     const returnCloset = await getClothesByUserId(token, userId);
     return returnCloset;
 }
 
+async function createClothesByName(userId, category, name) {
+    // name으로 userId의 clothes 만들기
+    await Clothes.create({
+        user_id: userId,
+        category_id: category,
+        name: name,
+        is_deleted: 0
+    });
+}
+
+async function createDefaultClothes(userId) {
+    // 유저 생성될 때 기본으로 생성되는 clothes들 만들기
+    await createClothesByName(userId, 1, '니트');
+    await createClothesByName(userId, 1, '후드티');
+    await createClothesByName(userId, 1, '티셔츠');
+    await createClothesByName(userId, 2, '데님팬츠');
+    await createClothesByName(userId, 2, '스커트');
+    await createClothesByName(userId, 2, '슬랙스');
+    await createClothesByName(userId, 3, '패딩');
+    await createClothesByName(userId, 3, '코트');
+    await createClothesByName(userId, 3, '점퍼');
+    await createClothesByName(userId, 4, '목도리');
+    await createClothesByName(userId ,4, '장갑');
+    await createClothesByName(userId, 4, '모자');    
+}
+
 module.exports = {
     getClothesByUserId,
     addClothesByUserId,
     deleteClothesByUserId,
-    getWeathyCloset
+    getWeathyCloset,
+    createDefaultClothes
 };

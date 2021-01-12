@@ -48,7 +48,7 @@ module.exports = {
                 userId,
                 nickname
             );
-            const token = await tokenService.refreshTokenOfUser(user.id);
+            const token = reqToken;
 
             return res.status(statusCode.OK).json({
                 user: {

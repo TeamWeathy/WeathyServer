@@ -91,7 +91,7 @@ async function getWeathyCloset(weathyId) {
 
         return closet;
     } catch (err) {
-        console.log(err);
+        throw Error(exception.SERVER_ERROR);
     }
 }
 

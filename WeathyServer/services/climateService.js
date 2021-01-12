@@ -58,5 +58,6 @@ module.exports = {
             iconId: icon_id,
             description: description
         };
-    }
+    },
+    getIconId
 };

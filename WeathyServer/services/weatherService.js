@@ -69,8 +69,30 @@ const getHourlyWeather = async (code, date, hour, timeFormat) => {
 };
 
 module.exports = {
-    getDailyWeather,
     getHourlyWeather,
+    getDailyWeather,
+    getDailyWeatherWithClimate: async (code, date) => {
+        const dailyWeather = await DailyWeather.findOne({
+            where: { location_id: code, date: date }
+        });
+        if (!dailyWeather) {
+            return null;
+        }
+        return {
+            date: {
+                month: dateUtils.getMonth(dailyWeather.date),
+                day: dateUtils.getDay(dailyWeather.date),
+                dayOfWeek: dateUtils.getYoil(dailyWeather.date)
+            },
+            temperature: {
+                maxTemp: dailyWeather.temperature_max,
+                minTemp: dailyWeather.temperature_min
+            },
+            climate: {
+                iconId: dailyWeather.climate_id
+            }
+        };
+    },
     getOverviewWeather: async (code, date, hour, timeFormat) => {
         const location = await locationService.getLocationByCode(code);
         const dailyWeather = await getDailyWeather(code, date);

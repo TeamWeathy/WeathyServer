@@ -102,7 +102,7 @@ module.exports = {
         let dailyWeatherList = [];
         for (let i = 0; i < 7; ++i) {
             dailyWeatherList.push(
-                await weatherService.getDailyWeather(code, date)
+                await weatherService.getDailyWeatherWithClimate(code, date)
             );
             date = dateUtils.getNextDay(date);
         }

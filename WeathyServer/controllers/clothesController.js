@@ -8,7 +8,7 @@ module.exports = {
         const reqToken = req.get('x-access-token');
         const { userId } = req.params;
 
-        if (!userId) {
+        if (!userId || !reqToken) {
             next(createError(400));
         }
 
@@ -39,7 +39,7 @@ module.exports = {
         const { userId } = req.params;
         const { category, name } = req.body;
 
-        if (!userId || !category || !name) {
+        if (!userId || !category || !name || !reqToken) {
             next(createError(400));
         }
 
@@ -76,7 +76,7 @@ module.exports = {
         const { userId } = req.params;
         const { clothes } = req.body;
 
-        if (!userId || !clothes) {
+        if (!userId || !clothes || !reqToken) {
             next(createError(400));
         }
 

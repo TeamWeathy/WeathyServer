@@ -151,6 +151,9 @@ module.exports = {
 
         let time = date.split('T')[1];
         date = date.split('T')[0];
+        if (!time) {
+            time = 12;
+        }
         if (!date || !time) {
             return next(createError(400));
         }

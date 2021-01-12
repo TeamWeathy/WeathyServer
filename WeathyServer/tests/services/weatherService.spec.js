@@ -11,6 +11,15 @@ const assertDailyWeather = (dailyWeather) => {
     assert.strictEqual(dailyWeather.temperature.minTemp, 100);
 };
 
+const assertDailyWeatherWithClimate = (dailyWeather) => {
+    assert.strictEqual(dailyWeather.date.month, 1);
+    assert.strictEqual(dailyWeather.date.day, 1);
+    assert.strictEqual(dailyWeather.date.dayOfWeek, '금요일');
+    assert.strictEqual(dailyWeather.temperature.maxTemp, -100);
+    assert.strictEqual(dailyWeather.temperature.minTemp, 100);
+    assert.strictEqual(dailyWeather.climate.iconId, 1);
+};
+
 const assertHourlyWeather = (hourlyWeather) => {
     assert.strictEqual(hourlyWeather.time, '오후 12시');
     assert.strictEqual(hourlyWeather.temperature, 10);
@@ -29,6 +38,22 @@ describe('weather service test', function () {
         });
         it('getDailyWeather returns null if not exists', async function () {
             const dailyWeather = await weatherService.getDailyWeather(
+                1100000000,
+                '2020-01-01'
+            );
+            assert(dailyWeather == null);
+        });
+    });
+    describe('getDailyWeatherWithClimate test', function () {
+        it('getDailyWeatherWithClimate returns dailyWeatherWithClimate', async function () {
+            const dailyWeather = await weatherService.getDailyWeatherWithClimate(
+                1100000000,
+                '2021-01-01'
+            );
+            assertDailyWeatherWithClimate(dailyWeather);
+        });
+        it('getDailyWeatherWithClimate returns null if not exists', async function () {
+            const dailyWeather = await weatherService.getDailyWeatherWithClimate(
                 1100000000,
                 '2020-01-01'
             );
@@ -87,7 +112,7 @@ describe('weather service test', function () {
             assert.strictEqual(overviewWeatherList.length, 1);
             assertDailyWeather(overviewWeatherList[0].dailyWeather);
             assertHourlyWeather(overviewWeatherList[0].hourlyWeather);
-        });
+        }).timeout(15000);
         it('getOverviewWeathers returns empty list if not exists', async function () {
             const overviewWeatherList = await weatherService.getOverviewWeathers(
                 '김자현',

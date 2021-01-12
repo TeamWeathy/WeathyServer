@@ -2,10 +2,7 @@ const cryptoRandomString = require('crypto-random-string');
 const { User, Token } = require('../models');
 const exception = require('../modules/exception');
 const { isValidTokenById } = require('../services/tokenService');
-
-const generateToken = () => {
-    return cryptoRandomString({ length: 30, type: 'alphanumeric' });
-};
+const { createDefaultClothes } = require('../services/clothesService');
 
 module.exports = {
     getUserByAccount: async (uuid) => {
@@ -34,11 +31,8 @@ module.exports = {
             nickname,
             uuid
         });
-        const token = user.id + ':' + generateToken();
-        await Token.create({
-            user_id: user.id,
-            token: token
-        });
+
+        await createDefaultClothes(user.id);
         return user;
     },
     modifyUserById: async (token, userId, nickname) => {

@@ -106,7 +106,7 @@ module.exports = {
         }
 
         try {
-            const { dailyWeatherId } = await weatherService.getDailyWeatherId(
+            const dailyWeatherId = await weatherService.getDailyWeatherId(
                 code,
                 date
             );
@@ -146,7 +146,10 @@ module.exports = {
             switch (error.message) {
                 case exception.NO_DAILY_WEATHER:
                     return next(
-                        createError(sc.BAD_REQUEST, '잘못된 날짜에 Weathy 작성')
+                        createError(
+                            sc.BAD_REQUEST,
+                            '해당 위치의 Daily Weather가 존재하지않음'
+                        )
                     );
                 case exception.DUPLICATION_WEATHY:
                     return next(

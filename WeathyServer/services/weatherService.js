@@ -34,6 +34,7 @@ const getDailyWeather = async (code, date) => {
     const dailyWeather = await DailyWeather.findOne({
         where: { location_id: code, date: date }
     });
+
     if (!dailyWeather) {
         return null;
     }
@@ -181,8 +182,6 @@ module.exports = {
             return null;
         }
 
-        return {
-            dailyWeatherId: dailyWeather.id
-        };
+        return dailyWeather.id;
     }
 };

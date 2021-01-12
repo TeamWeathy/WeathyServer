@@ -18,7 +18,6 @@ const assertDailyWeather = (dailyWeather) => {
 
 const assertHourlyWeather = (hourlyWeather) => {
     assert.strictEqual(hourlyWeather.climate.iconId, 2);
-    assert.strictEqual(hourlyWeather.climate.description, '');
     assert.strictEqual(hourlyWeather.pop, 0);
 };
 
@@ -40,17 +39,14 @@ const assertWeathy = ({ weathy }) => {
 };
 
 describe('weathy service test', function () {
-    describe('getRecommendedWeathy test', function () {
-        it('getWeathy returns recommend Weathy', async function () {
+    describe('getdWeathy test', function () {
+        it('getWeathy returns Weathy', async function () {
             const weathy = await weathyService.getWeathy('2021-01-01', 1);
             assertWeathy(weathy);
         });
 
         it('getDailyWeather returns null', async function () {
-            const weathy = await weathyService.getWeathy(
-                1100000000,
-                '3000-01-01'
-            );
+            const weathy = await weathyService.getWeathy('3000-01-01', 1);
             assert(weathy === null);
         });
     });

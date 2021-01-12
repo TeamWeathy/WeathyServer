@@ -4,10 +4,6 @@ const exception = require('../modules/exception');
 const { isValidTokenById } = require('../services/tokenService');
 const { createDefaultClothes } = require('../services/clothesService');
 
-const generateToken = () => {
-    return cryptoRandomString({ length: 30, type: 'alphanumeric' });
-};
-
 module.exports = {
     getUserByAccount: async (uuid) => {
         // uuid로 user 가져오기

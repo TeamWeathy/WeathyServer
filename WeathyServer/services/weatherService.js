@@ -60,7 +60,10 @@ const getHourlyWeather = async (code, date, hour, timeFormat) => {
     return {
         time: timeFormat(hourlyWeather.hour),
         temperature: hourlyWeather.temperature,
-        climate: await climateService.getById(hourlyWeather.climate_id),
+        climate: await climateService.getClimate(
+            hourlyWeather.climate_id,
+            hourlyWeather.temperature
+        ),
         pop: hourlyWeather.pop
     };
 };

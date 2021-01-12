@@ -9,6 +9,7 @@ const indexRouter = require('./routes/index');
 const authRouter = require('./routes/auth');
 const usersRouter = require('./routes/users');
 const weathyRouter = require('./routes/weathy');
+const weatherRouter = require('./routes/weather');
 
 const { swaggerUi, specs } = require('./modules/swagger');
 const exception = require('./modules/exception');
@@ -30,8 +31,8 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 app.use('/', indexRouter);
 app.use('/auth', authRouter);
 app.use('/users', usersRouter);
+app.use('/weather', weatherRouter);
 app.use('/weathy', weathyRouter);
-// app.use()
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -40,9 +41,6 @@ app.use(function (req, res, next) {
 
 // error handler
 app.use(function (err, req, res, next) {
-    // set locals, only providing error in development
-
-    // render the error page
     res.status(err.status || 500).json({
         message: err.message
     });

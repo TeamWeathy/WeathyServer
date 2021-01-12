@@ -7,7 +7,7 @@ const { tokenService, calendarService } = require('../services');
 module.exports = {
     getCalendarOverviews: async (req, res, next) => {
         const { userId } = req.params;
-        const { token } = req.body;
+        const token = req.get('x-access-token');
         const { start, end } = req.query;
 
         if (!token || !start || !end) {
@@ -15,23 +15,23 @@ module.exports = {
         }
 
         try {
-            tokenService.validateTokenWithUserId(userId, token);
+            await tokenService.validateTokenWithUserId(userId, token);
             const validCalendarOverviewList = await calendarService.getValidCalendarOverviewList(
                 userId,
                 start,
                 end
             );
             let calendarOverviewList = [];
-            let curDay = Date(start);
-            let endDay = Date(end);
+            let curDay = new Date(start);
+            let endDay = new Date(end);
             let pos = 0;
-            while (curDay.getDate() <= endDay.getDate()) {
+            while (curDay <= endDay) {
                 if (
                     pos < validCalendarOverviewList.length &&
                     validCalendarOverviewList[pos].date ==
                         dateUtils.formatDate(curDay)
                 ) {
-                    calendarOverviewList.push(validCalendarOverviewList[pos]);
+                    calendarOverviewList.push(validCalendarOverviewList[pos++]);
                 } else {
                     calendarOverviewList.push(null);
                 }

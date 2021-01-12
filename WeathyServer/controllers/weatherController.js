@@ -35,7 +35,7 @@ module.exports = {
         }
 
         try {
-            const overviewWeather = weatherService.getOverviewWeather(
+            const overviewWeather = await weatherService.getOverviewWeather(
                 code,
                 date,
                 time,
@@ -71,15 +71,15 @@ module.exports = {
 
         let hourlyWeatherList = [];
         for (let i = 0; i < 24; ++i) {
-            hourlyWeatherList.push_back(
-                weatherService.getHourlyWeather(
+            hourlyWeatherList.push(
+                await weatherService.getHourlyWeather(
                     code,
                     date,
                     time,
                     dateUtils.format24
                 )
             );
-            let { next_date, next_time } = dateUtils.getNextHour(date, time);
+            const { next_date, next_time } = dateUtils.getNextHour(date, time);
             date = next_date;
             time = next_time;
         }
@@ -101,8 +101,8 @@ module.exports = {
 
         let dailyWeatherList = [];
         for (let i = 0; i < 7; ++i) {
-            dailyWeatherList.push_back(
-                weatherService.getDailyWeather(code, date)
+            dailyWeatherList.push(
+                await weatherService.getDailyWeather(code, date)
             );
             date = dateUtils.getNextDay(date);
         }
@@ -123,15 +123,21 @@ module.exports = {
         }
 
         try {
-            let extraWeather = weatherService.getExtraDailyWeather(code, date);
-            return res.status(statusCode.ok).json({
+            let extraWeather = await weatherService.getExtraDailyWeather(
+                code,
+                date
+            );
+            return res.status(statusCode.OK).json({
                 extraWeather,
                 message: '상세 날씨 조회 성공'
             });
         } catch (error) {
             switch (error.message) {
                 case exception.NO_DATA:
-                    return next(createError(204));
+                    return res.status(statusCode.NO_CONTENT).json({
+                        extraWeather: null,
+                        message: '날씨 정보를 찾을 수 없음'
+                    });
                 default:
                     return next(createError(400));
             }
@@ -150,7 +156,7 @@ module.exports = {
         }
 
         try {
-            const overviewWeatherList = weatherService.getOverviewWeathers(
+            const overviewWeatherList = await weatherService.getOverviewWeathers(
                 keyword,
                 date,
                 time,

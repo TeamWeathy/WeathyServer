@@ -9,7 +9,6 @@ const day_of_week = [
 ];
 
 const formatDate = (d) => {
-    console.log(d.getMonth());
     let month = '' + (d.getMonth() + 1);
     let day = '' + d.getDate();
     const year = d.getFullYear();
@@ -54,7 +53,7 @@ module.exports = {
             day.setDate(day.getDate() + 1);
             time = 0;
         }
-        return { date: formatDate(day), time };
+        return { next_date: formatDate(day), next_time: time };
     },
     getNextDay: (date) => {
         let day = new Date(date);

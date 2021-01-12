@@ -1,5 +1,6 @@
 module.exports = {
     OK: 200,
+
     NO_CONTENTS: 204,
     INVALID_ACCOUNT: 401,
 

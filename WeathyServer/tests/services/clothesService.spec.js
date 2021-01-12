@@ -85,7 +85,7 @@ describe('clothesService test', function () {
             });
 
             assert.strictEqual(deletedAfterClothes, null);
-        });
+        }).timeout(15000);
 
         it('Second deletion makes exception NO_CLOTHES', async () => {
             const token = await Token.findOne({ where: { user_id: userId } });

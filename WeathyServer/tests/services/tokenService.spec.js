@@ -23,9 +23,13 @@ describe('tokenService test', function () {
             { where: { user_id: 1 } }
         );
     });
+
     describe('isValidTokenById Test', function () {
         it('check valid token by id', async () => {
             assert.ok(await isValidTokenById(1, '1:aa'));
+            assert.ok(async () => {
+                await isValidTokenById(1, '1:a');
+            }, exception.MISMATCH_TOKEN);
         });
     });
 

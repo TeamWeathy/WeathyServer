@@ -28,10 +28,11 @@ module.exports = {
             const weathy = weathies[i];
             validCalendarOverviewList.push({
                 id: weathy.id,
+                date: weathy.DailyWeather.date,
                 stampId: weathy.stampId,
                 temperature: {
-                    maxTemp: weathy.temperature_max,
-                    minTemp: weathy.temperature_min
+                    maxTemp: weathy.DailyWeather.temperature_max,
+                    minTemp: weathy.DailyWeather.temperature_min
                 }
             });
         }

@@ -194,6 +194,7 @@ describe('weathy service test', function () {
                     weathy_id: weathyId
                 }
             });
+
             assert.ok(modifedWeathy.description === 'feedback was changed');
             assert.ok(modifedWeathy.emoji_id === 1);
             assert.ok(modifedWeathy.DailyWeather.location_id === code);

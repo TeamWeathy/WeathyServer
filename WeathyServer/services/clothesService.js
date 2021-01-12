@@ -84,7 +84,7 @@ async function getWeathyCloset(weathyId) {
             const clothesName = wc.Clothe.name;
 
             closet[categoryName].clothes.push({
-                id: clothesId,
+                categoryId: clothesId,
                 name: clothesName
             });
         }

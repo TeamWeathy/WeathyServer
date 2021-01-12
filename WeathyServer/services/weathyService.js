@@ -227,7 +227,8 @@ const checkOwnerClothes = async (clothes, userId) => {
 
     const clothesList = await Clothes.findAll({
         where: {
-            user_id: userId
+            user_id: userId,
+            is_deleted: 0
         },
         attributes: ['id']
     });
@@ -295,7 +296,7 @@ const getWeathy = async (date, userId) => {
         format12
     );
 
-    dailyWeather.region = await locationService.getLocationByCode(code);
+    const region = await locationService.getLocationByCode(code);
 
     weathy.dailyWeather = dailyWeather;
     weathy.hourlyWeather = hourlyWeather;
@@ -306,6 +307,7 @@ const getWeathy = async (date, userId) => {
 
     return {
         weathy: {
+            region,
             dailyWeather,
             hourlyWeather: {
                 climate: hourlyWeather.climate,

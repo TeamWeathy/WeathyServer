@@ -1,6 +1,6 @@
 const dateUtils = require('../utils/dateUtils');
 const exception = require('../modules/exception');
-const { DailyWeather, HourlyWeather } = require('../models');
+const { DailyWeather, HourlyWeather, Climate } = require('../models');
 const climateService = require('./climateService');
 const locationService = require('./locationService');
 
@@ -39,6 +39,7 @@ const getDailyWeather = async (code, date) => {
     }
     return {
         date: {
+            year: dateUtils.getYear(dailyWeather.date),
             month: dateUtils.getMonth(dailyWeather.date),
             day: dateUtils.getDay(dailyWeather.date),
             dayOfWeek: dateUtils.getYoil(dailyWeather.date)
@@ -134,6 +135,7 @@ module.exports = {
         }
         return overviewWeatherList;
     },
+
     getExtraDailyWeather: async (code, date) => {
         const dailyWeather = await DailyWeather.findOne({
             where: { location_id: code, date: date }
@@ -154,6 +156,33 @@ module.exports = {
                 value: dailyWeather.wind_speed,
                 rating: getWindRating(dailyWeather.wind_speed)
             }
+        };
+    },
+    getDailyClimateId: async (code, date) => {
+        const dailyWeather = await DailyWeather.findOne({
+            where: { location_id: code, date }
+        });
+        if (!dailyWeather) {
+            return null;
+        }
+        return {
+            climateId: dailyWeather.climate_id
+        };
+    },
+    getDailyWeatherId: async (code, date) => {
+        const dailyWeather = await DailyWeather.findOne({
+            where: {
+                location_id: code,
+                date
+            }
+        });
+
+        if (!dailyWeather) {
+            return null;
+        }
+
+        return {
+            dailyWeatherId: dailyWeather.id
         };
     }
 };

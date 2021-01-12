@@ -3,12 +3,17 @@ const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const morgan = require('morgan');
+const sc = require('./modules/statusCode');
 
 const indexRouter = require('./routes/index');
 const authRouter = require('./routes/auth');
 const usersRouter = require('./routes/users');
+const weathyRouter = require('./routes/weathy');
 const weatherRouter = require('./routes/weather');
+
 const { swaggerUi, specs } = require('./modules/swagger');
+const exception = require('./modules/exception');
+const logger = require('winston');
 
 const app = express();
 
@@ -27,6 +32,7 @@ app.use('/', indexRouter);
 app.use('/auth', authRouter);
 app.use('/users', usersRouter);
 app.use('/weather', weatherRouter);
+app.use('/weathy', weathyRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -34,14 +40,10 @@ app.use(function (req, res, next) {
 });
 
 // error handler
-app.use(function (err, req, res) {
-    // set locals, only providing error in development
-    res.locals.message = err.message;
-    res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-    // render the error page
-    res.status(err.status || 500);
-    res.render('error');
+app.use(function (err, req, res, next) {
+    res.status(err.status || 500).json({
+        message: err.message
+    });
 });
 
 module.exports = app;

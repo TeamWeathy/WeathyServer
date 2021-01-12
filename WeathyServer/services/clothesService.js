@@ -1,7 +1,23 @@
-const { Clothes, ClothesCategory } = require('../models');
+const { Clothes, ClothesCategory, WeathyClothes } = require('../models');
 const exception = require('../modules/exception');
 const { isValidTokenById } = require('./tokenService');
 const { Op } = require('sequelize');
+
+const setClothesForm = async () => {
+    const closet = {};
+
+    const clothesCategories = await ClothesCategory.findAll({
+        attributes: ['name', 'id']
+    });
+
+    for (const c of clothesCategories) {
+        closet[c.name] = {
+            id: c.id,
+            clothes: []
+        };
+    }
+    return closet;
+};
 
 async function getClothesByUserId(token, userId) {
     // token과 userId로 valid한지 체크하고, clothes 가져옴
@@ -33,6 +49,49 @@ async function getClothesByUserId(token, userId) {
         }
 
         return returnCloset;
+    }
+}
+
+async function getWeathyCloset(weathyId) {
+    try {
+        const closet = await setClothesForm();
+
+        const weathyClothes = await WeathyClothes.findAll({
+            include: [
+                {
+                    model: Clothes,
+                    required: true,
+                    paranoid: false,
+                    attributes: ['id', 'name'],
+                    include: [
+                        {
+                            model: ClothesCategory,
+                            required: true,
+                            paranoid: false,
+                            attributes: ['id', 'name']
+                        }
+                    ]
+                }
+            ],
+            where: {
+                weathy_id: weathyId
+            }
+        });
+
+        for (let wc of weathyClothes) {
+            const categoryName = wc.Clothe.ClothesCategory.name;
+            const clothesId = wc.Clothe.id;
+            const clothesName = wc.Clothe.name;
+
+            closet[categoryName].clothes.push({
+                id: clothesId,
+                name: clothesName
+            });
+        }
+
+        return closet;
+    } catch (err) {
+        console.log(err);
     }
 }
 
@@ -136,5 +195,6 @@ async function deleteClothesByUserId(token, userId, clothesList) {
 module.exports = {
     getClothesByUserId,
     addClothesByUserId,
-    deleteClothesByUserId
+    deleteClothesByUserId,
+    getWeathyCloset
 };

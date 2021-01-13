@@ -45,7 +45,10 @@ module.exports = {
                 return res.status(sc.NO_CONTENTS).json({});
             }
 
-            return res.status(sc.OK).json(recommendedWeathy);
+            return res.status(sc.OK).json({
+                ...recommendedWeathy,
+                message: '추천 웨디 조회 성공'
+            });
         } catch (error) {
             switch (error.message) {
                 default:

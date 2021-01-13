@@ -11,16 +11,11 @@ const TOKEN_EXPIRES_IN_HOURS = 1; // 토큰 유효 기간 (1시간)
 const checkTokenExpired = async (token) => {
     // token이 expired 되었는지 확인
     
-    console.log(token.updatedAt);
     const updatedTime = dayjs(token.updatedAt);
     const expirationTime = updatedTime.add(TOKEN_EXPIRES_IN_HOURS, 'h');
 
     const now = dayjs(new Date());
     
-    console.log('**now**' + now);
-    console.log('**updatedTime**' + updatedTime);
-    console.log('**expirationTime**' + expirationTime);
-
     if (now.isBefore(expirationTime)) {
         return false;
     } else {
@@ -71,7 +66,6 @@ const tokenMiddleware = async (req, res, next) => {
         req.userId = userId;
         await refreshTokenTimeOfUser(userId);
     } catch (error) {
-        console.log(error);
         switch(error.message) {
             case exception.EXPIRED_TOKEN:
             case exception.INVALID_TOKEN:

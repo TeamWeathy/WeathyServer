@@ -18,6 +18,6 @@ router.get(
     tokenMiddleware,
     weathyController.getRecommendedWeathy
 );
-router.get('/:userId/calendar', tokenMiddleware, calendarController.getCalendarOverviews);
+router.get('/:userId/calendar', calendarController.getCalendarOverviews);
 
 module.exports = router;

@@ -29,7 +29,7 @@ module.exports = {
             validCalendarOverviewList.push({
                 id: weathy.id,
                 date: weathy.DailyWeather.date,
-                stampId: weathy.stampId,
+                stampId: weathy.emoji_id,
                 temperature: {
                     maxTemp: weathy.DailyWeather.temperature_max,
                     minTemp: weathy.DailyWeather.temperature_min

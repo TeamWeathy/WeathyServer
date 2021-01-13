@@ -194,8 +194,8 @@ async function createDefaultClothes(userId) {
     await createClothesByName(userId, 3, '코트');
     await createClothesByName(userId, 3, '점퍼');
     await createClothesByName(userId, 4, '목도리');
-    await createClothesByName(userId, 4, '장갑');
-    await createClothesByName(userId, 4, '모자');
+    await createClothesByName(userId ,4, '장갑');
+    await createClothesByName(userId, 4, '모자');    
 }
 
 module.exports = {

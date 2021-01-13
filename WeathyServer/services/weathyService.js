@@ -12,7 +12,6 @@ const locationService = require('./locationService');
 const weatherService = require('./weatherService');
 const clothesService = require('./clothesService');
 const exception = require('../modules/exception');
-const { async } = require('crypto-random-string');
 
 const calculateConditionPoint = (candidate, todayWeather) => {
     const { todayTemp, todayClimateId } = todayWeather;
@@ -33,9 +32,6 @@ const calculateConditionPoint = (candidate, todayWeather) => {
                 Math.abs(pastMaxTemp - pastMinTemp)
         ) * 2;
     const condition3 = todayClimateId % 100 === pastClimateId % 100 ? 1 : 0;
-
-    if (candidate.DailyWeather.date == '2023-12-13')
-        console.log(condition1 + condition2 + condition3, candidate);
 
     return condition1 + condition2 + condition3;
 };

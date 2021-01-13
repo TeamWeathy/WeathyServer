@@ -5,7 +5,8 @@ const exception = require('../../modules/exception');
 const {
     isValidTokenById,
     validateTokenWithUserId,
-    refreshTokenOfUser
+    refreshTokenValueOfUser,
+    refreshTokenTimeOfUser,
 } = require('../../services/tokenService');
 
 let originalTokenValue;
@@ -51,22 +52,30 @@ describe('tokenService test', function () {
         });
     });
 
-    describe('refreshTokenOfUser test', function () {
-        let token, firstTime, firstToken, secondTime, secondToken;
+    describe('refreshTokenValueOfUser test', function () {
+        let token, firstToken, secondToken;
         before('refresh token', async () => {
             token = await Token.findOne({ where: { user_id: 1 } });
-            firstTime = dayjs(token.updated_at);
             firstToken = token.token;
-            await refreshTokenOfUser(1);
+            await refreshTokenValueOfUser(1);
             token = await Token.findOne({ where: { user_id: 1 } });
             secondToken = token.token;
-            secondTime = dayjs(token.updated_at);
         });
 
         it('token value should be updated', () => {
             assert.ok(firstToken !== secondToken);
         });
+    });
 
+    describe('refreshTokenTimeOfUser test', function () {
+        let token, firstTime, secondTime;
+        before('refresh token', async () => {
+            token = await Token.findOne({ where: { user_id: 1 } });
+            firstTime = dayjs(token.updated_at);
+            await refreshTokenTimeOfUser(1);
+            token = await Token.findOne({ where: { user_id: 1 } });
+            secondTime = dayjs(token.updated_at);
+        });
         it('token update_at should be updated', () => {
             assert.ok(firstTime !== secondTime);
         });

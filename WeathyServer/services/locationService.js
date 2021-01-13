@@ -48,7 +48,7 @@ module.exports = {
                     [Op.like]: '%' + keyword + '%'
                 }
             },
-            attributes: ['id', 'name']
+            attributes: [['id', 'code'], 'name']
         });
         return locations;
     }

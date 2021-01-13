@@ -118,9 +118,9 @@ module.exports = {
         let overviewWeatherList = [];
         for (let i = 0; i < locations.length; ++i) {
             const location = locations[i];
-            const dailyWeather = await getDailyWeather(location.id, date);
+            const dailyWeather = await getDailyWeather(location.dataValues.code, date);
             const hourlyWeather = await getHourlyWeather(
-                location.id,
+                location.dataValues.code,
                 date,
                 hour,
                 timeFormat

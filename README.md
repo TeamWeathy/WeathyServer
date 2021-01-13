@@ -61,7 +61,8 @@
 Open weather api 를 사용하여 날씨를 수집하고, 해당 날씨에 사용자 의상 착의를 기록하여 사용자에게 날씨 맞춤 의상을 추천해준다.
 
 ### 팀별 역할 분담
-- 신연상 : 리드 개발, api 문서 관리 및 api 개발
-- 최선욱 : open weather batch 프로그램 개발
-- 김자현 : 전반적인 DB 관리 및 api 개발
+- 신연상 : API 위키 문서 관리, Login, User, CLothes API 개발 및 테스트코드 작성
+- 최선욱 : Open Weather Batch 프로그램 개발, Weathy API 개발 및 테스트코드 작성
+- 김자현 : 스키마 작성, Calendar, Weather API 개발 및 테스트코드 작성
+이외의 API 설계, 코드 리뷰 등은 함께 하였음!
 

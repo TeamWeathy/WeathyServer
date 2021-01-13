@@ -4,6 +4,11 @@ const weathyService = require('../../services/weathyService');
 const exception = require('../../modules/exception');
 const { Weathy, WeathyClothes, DailyWeather } = require('../../models');
 
+const assertRegion = (region) => {
+    assert.strictEqual(region.code, 1100000000);
+    assert.strictEqual(region.name, '서울특별시');
+}
+
 const assertDailyWeather = (dailyWeather) => {
     assert.strictEqual(dailyWeather.date.month, 1);
     assert.strictEqual(dailyWeather.date.day, 1);
@@ -11,9 +16,6 @@ const assertDailyWeather = (dailyWeather) => {
 
     assert.strictEqual(dailyWeather.temperature.maxTemp, -100);
     assert.strictEqual(dailyWeather.temperature.minTemp, 100);
-
-    assert.strictEqual(dailyWeather.region.code, 1100000000);
-    assert.strictEqual(dailyWeather.region.name, '서울특별시');
 };
 
 const assertHourlyWeather = (hourlyWeather) => {
@@ -22,13 +24,14 @@ const assertHourlyWeather = (hourlyWeather) => {
 };
 
 const assertClosetWeather = (closet) => {
-    assert.strictEqual(closet.top.id, 1);
-    assert.strictEqual(closet.bottom.id, 2);
-    assert.strictEqual(closet.outer.id, 3);
-    assert.strictEqual(closet.etc.id, 4);
+    assert.strictEqual(closet.top.categoryId, 1);
+    assert.strictEqual(closet.bottom.categoryId, 2);
+    assert.strictEqual(closet.outer.categoryId, 3);
+    assert.strictEqual(closet.etc.categoryId, 4);
 };
 
 const assertWeathy = ({ weathy }) => {
+    assertRegion(weathy.region);
     assertDailyWeather(weathy.dailyWeather);
     assertHourlyWeather(weathy.hourlyWeather);
     assertClosetWeather(weathy.closet);

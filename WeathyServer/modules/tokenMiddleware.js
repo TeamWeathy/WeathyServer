@@ -8,13 +8,18 @@ const { generateToken } = require('../utils/tokenUtils');
 
 const TOKEN_EXPIRES_IN_HOURS = 1; // 토큰 유효 기간 (1시간)
 
-//이런식 미들웨어로 변경 => 논의
 const checkTokenExpired = async (token) => {
     // token이 expired 되었는지 확인
-    const updatedTime = dayjs(token.updated_at);
+    
+    console.log(token.updatedAt);
+    const updatedTime = dayjs(token.updatedAt);
     const expirationTime = updatedTime.add(TOKEN_EXPIRES_IN_HOURS, 'h');
 
     const now = dayjs(new Date());
+    
+    console.log('**now**' + now);
+    console.log('**updatedTime**' + updatedTime);
+    console.log('**expirationTime**' + expirationTime);
 
     if (now.isBefore(expirationTime)) {
         return false;
@@ -66,7 +71,16 @@ const tokenMiddleware = async (req, res, next) => {
         req.userId = userId;
         await refreshTokenTimeOfUser(userId);
     } catch (error) {
-        next(createError(sc.BAD_REQUEST, 'Token Error'));
+        console.log(error);
+        switch(error.message) {
+            case exception.EXPIRED_TOKEN:
+            case exception.INVALID_TOKEN:
+                next(createError(sc.INVALID_ACCOUNT, 'Token Error'));
+                break;
+            default:
+                next(createError(sc.INTERNAL_SERVER_ERROR, 'Server Error'));
+                break;
+        }
     }
     next();
 };

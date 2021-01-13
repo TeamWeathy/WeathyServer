@@ -95,6 +95,7 @@ module.exports = {
             }
         };
     },
+    
     getOverviewWeather: async (code, date, hour, timeFormat) => {
         const location = await locationService.getLocationByCode(code);
         const dailyWeather = await getDailyWeather(code, date);
@@ -113,6 +114,7 @@ module.exports = {
             hourlyWeather
         };
     },
+
     getOverviewWeathers: async (keyword, date, hour, timeFormat) => {
         const locations = await locationService.getLocationsByKeyword(keyword);
         let overviewWeatherList = [];
@@ -159,6 +161,7 @@ module.exports = {
             }
         };
     },
+
     getDailyClimateId: async (code, date) => {
         const dailyWeather = await DailyWeather.findOne({
             where: { location_id: code, date }
@@ -170,6 +173,7 @@ module.exports = {
             climateId: dailyWeather.climate_id
         };
     },
+
     getDailyWeatherId: async (code, date) => {
         const dailyWeather = await DailyWeather.findOne({
             where: {

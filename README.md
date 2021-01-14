@@ -63,6 +63,6 @@ Open weather api 를 사용하여 날씨를 수집하고, 해당 날씨에 사�
 ### 팀별 역할 분담
 - 신연상 : API 위키 문서 관리, Login, User, CLothes API 개발 및 테스트코드 작성
 - 최선욱 : Open Weather Batch 프로그램 개발, Weathy API 개발 및 테스트코드 작성
-- 김자현 : 스키마 작성, Calendar, Weather API 개발 및 테스트코드 작성  
+- 김자현 : 스키마 설계, DB 권한 및 계정 , Calendar, Weather API 개발 및 테스트코드 작성  
 이외의 API 설계, 코드 리뷰 등은 함께 하였음!
 

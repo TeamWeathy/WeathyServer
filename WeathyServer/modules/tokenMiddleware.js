@@ -52,7 +52,10 @@ const refreshTokenTimeOfUser = async (user_id) => {
             { where: { user_id: user_id } },
             { transaction }
         );
+
+        await transaction.commit();
     } catch (err) {
+        await transaction.rollcack();
         throw Error(exception.SERVER_ERROR);
     }
 };

@@ -3,12 +3,12 @@ const { Token } = require('../models');
 const { generateToken, isUserOwnerOfToken } = require('../utils/tokenUtils');
 const exception = require('../modules/exception');
 
-const TOKEN_EXPIRES_IN_HOURS = 1; // 토큰 유효 기간 (100일)
+const TOKEN_EXPIRES_IN_YEARS = 1;
 
 const checkTokenExpired = async (token) => {
     // token이 expired 되었는지 확인
     const updatedTime = dayjs(token.updated_at);
-    const expirationTime = updatedTime.add(TOKEN_EXPIRES_IN_HOURS, 'h');
+    const expirationTime = updatedTime.add(TOKEN_EXPIRES_IN_YEARS, 'y');
 
     const now = dayjs(new Date());
 

@@ -17,6 +17,14 @@ const logger = require('winston');
 
 const app = express();
 
+// set etag false
+// 동적 요청에 대한 응답을 보낼 때 etag 생성을 하지 않도록 설정
+app.set("etag", false);
+
+// 정적 요청에 대한 응답을 보낼 때 etag 생성을 하지 않도록 설정
+const options = { etag: false };
+app.use(express.static("public", options));
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');

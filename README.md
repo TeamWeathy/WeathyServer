@@ -24,30 +24,40 @@
 
 ### dependencies module (package.json)
 #### Dev module: 
-- `decache`: v 4.6.0  
-- `eslint`: v 7.16.0
-- `eslint-config-prettier`: v 7.1.0
-- `eslint-plugin-prettier`: v 3.3.0
-- `mocha`: v 8.2.1
-- `prettier`:v 2.2.1
-- `swagger-jsdoc`: v 6.0.0
-- `swagger-ui-express`: v 4.1.6"
+```json
+  "devDependencies": {
+    "decache": "^4.6.0",
+    "eslint": "^7.16.0",
+    "eslint-config-prettier": "^7.1.0",
+    "eslint-plugin-prettier": "^3.3.0",
+    "mocha": "^8.2.1",
+    "prettier": "2.2.1",
+    "swagger-jsdoc": "^6.0.0",
+    "swagger-ui-express": "^4.1.6"
+  }
+```
 
 #### module:
-- `app-root-path`: "^3.0.0",
-- `cookie-parser`: "~1.4.4",
-- `debug`: "~2.6.9",
-- `express`: "~4.16.1",
-- `http-errors`: "~1.6.3",
-- `jade`: "~1.11.0",
-- `morgan`: "~1.9.1",
-- `mysql2`: "^2.2.5",
-- `node-schedule`: "^1.3.2",
-- `request-promise`: "^4.2.6",
-- `sequelize`: "^6.3.5",
-- `sequelize-cli`: "^6.2.0",
-- `winston`: "^3.3.3",
-- `winston-daily-rotate-file`: "^4.5.0"
+```json
+  "dependencies": {
+    "app-root-path": "^3.0.0",
+    "cookie-parser": "~1.4.4",
+    "crypto-random-string": "^3.3.0",
+    "dayjs": "^1.10.2",
+    "debug": "~2.6.9",
+    "express": "~4.16.1",
+    "http-errors": "~1.6.3",
+    "jade": "~1.11.0",
+    "morgan": "~1.9.1",
+    "mysql2": "^2.2.5",
+    "request": "^2.88.2",
+    "request-promise": "^4.2.6",
+    "sequelize": "^6.3.5",
+    "sequelize-cli": "^6.2.0",
+    "winston": "^3.3.3",
+    "winston-daily-rotate-file": "^4.5.0"
+  }
+```
 
 ### ER Diagram
 ![image](https://user-images.githubusercontent.com/22928068/103475327-a4108280-4def-11eb-8d7b-0063b61ebb7b.png)

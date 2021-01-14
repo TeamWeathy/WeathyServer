@@ -7,7 +7,7 @@ const { Weathy, WeathyClothes, DailyWeather } = require('../../models');
 const assertRegion = (region) => {
     assert.strictEqual(region.code, 1100000000);
     assert.strictEqual(region.name, '서울특별시');
-}
+};
 
 const assertDailyWeather = (dailyWeather) => {
     assert.strictEqual(dailyWeather.date.month, 1);
@@ -54,7 +54,7 @@ describe('weathy service test', function () {
         });
     });
     describe('getWeathy test', function () {
-        it('getReommendedWeathy returns recommened weathy', async function () {
+        it('getRecommendedWeathy returns recommened weathy', async function () {
             const weathy = await weathyService.getRecommendedWeathy(
                 2647000000,
                 '2021-01-11',
@@ -65,7 +65,7 @@ describe('weathy service test', function () {
             assert.ok(weathy.id == answerWeathy.id);
         });
 
-        it('getReommendedWeathy returns null', async function () {
+        it('getRecommendedWeathy returns null', async function () {
             const weathy = await weathyService.getRecommendedWeathy(
                 1100000000,
                 '3000-01-01',

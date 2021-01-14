@@ -1,6 +1,6 @@
 const dateUtils = require('../utils/dateUtils');
 const exception = require('../modules/exception');
-const { DailyWeather, HourlyWeather, Climate } = require('../models');
+const { DailyWeather, HourlyWeather } = require('../models');
 const climateService = require('./climateService');
 const locationService = require('./locationService');
 
@@ -95,7 +95,7 @@ module.exports = {
             }
         };
     },
-    
+
     getOverviewWeather: async (code, date, hour, timeFormat) => {
         const location = await locationService.getLocationByCode(code);
         const dailyWeather = await getDailyWeather(code, date);
@@ -120,7 +120,10 @@ module.exports = {
         let overviewWeatherList = [];
         for (let i = 0; i < locations.length; ++i) {
             const location = locations[i];
-            const dailyWeather = await getDailyWeather(location.dataValues.code, date);
+            const dailyWeather = await getDailyWeather(
+                location.dataValues.code,
+                date
+            );
             const hourlyWeather = await getHourlyWeather(
                 location.dataValues.code,
                 date,
@@ -149,7 +152,7 @@ module.exports = {
         return {
             rain: {
                 value: dailyWeather.precipitation,
-                rating: getRainRating(dailyWeather.precipation)
+                rating: getRainRating(dailyWeather.precipitation)
             },
             humidity: {
                 value: dailyWeather.humidity,

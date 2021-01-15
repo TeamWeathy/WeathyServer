@@ -25,6 +25,7 @@ const checkTokenExpired = async (token) => {
 
 const getUserIdByToken = async (token) => {
     // sequalizer에서 token으로 user_id 가져오기 expired 되었는지도 확인
+    console.log('getUserIdByToken:::' + token);
     const userToken = await Token.findOne({ where: { token: token } });
     console.log('getUserIdByToken, userToken:::' + userToken);
     if (userToken === null) {
@@ -87,6 +88,7 @@ const tokenMiddleware = async (req, res, next) => {
     }
 
     try {
+        console.log('tokenMiddleware token:::' + token);
         const userId = await getUserId(token);
         req.userId = userId;
         await refreshTokenTimeOfUser(userId);

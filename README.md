@@ -60,11 +60,11 @@
 ```
 
 ### ER Diagram
-![image](https://user-images.githubusercontent.com/22928068/103475327-a4108280-4def-11eb-8d7b-0063b61ebb7b.png)
+![ERD](https://imgur.com/fIjtbo3.png)
 
 
 ### 서버 아키텍쳐
-<img width="1282" alt="스크린샷 2021-01-03 오후 6 13 24" src="https://user-images.githubusercontent.com/22928068/103475300-601d7d80-4def-11eb-98c9-c04ab3d90770.png">
+![Arch](https://imgur.com/EN9EiqB.png)
 
 
 ### 핵심 기능 설명

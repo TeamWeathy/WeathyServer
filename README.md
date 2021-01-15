@@ -60,11 +60,11 @@
 ```
 
 ### ER Diagram
-![ERD](https://imgur.com/fIjtbo3.png)
+<img src=https://imgur.com/fIjtbo3.png width="550">
 
 
 ### 서버 아키텍쳐
-![Arch](https://imgur.com/EN9EiqB.png)
+<img src=https://imgur.com/EN9EiqB.png width="750">
 
 
 ### 핵심 기능 설명

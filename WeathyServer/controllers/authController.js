@@ -10,10 +10,9 @@ module.exports = {
         if (!uuid) {
             next(createError(400));
         }
-
         try {
             const user = await userService.getUserByAccount(uuid);
-            // const token = await tokenService.refreshTokenValueOfUser(user.id);
+            const token = await tokenService.refreshTokenValueOfUser(user.id);
             return res.status(statusCode.OK).json({
                 user: {
                     id: user.id,

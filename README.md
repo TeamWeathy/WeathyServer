@@ -67,7 +67,7 @@
 
 
 ### 서버 아키텍쳐
-<img src=https://imgur.com/EN9EiqB.png width="750">
+<img src=https://imgur.com/2hunZHg.png width="750">
 
 
 ### 핵심 기능 설명

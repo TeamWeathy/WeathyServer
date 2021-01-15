@@ -6,13 +6,13 @@ const sc = require('./statusCode');
 const exception = require('./exception');
 const { generateToken } = require('../utils/tokenUtils');
 
-const TOKEN_EXPIRES_IN_HOURS = 1; // 토큰 유효 기간 (1시간)
+const TOKEN_EXPIRES_IN_YEARS = 1; // 토큰 유효 기간 (1시간)
 
 const checkTokenExpired = async (token) => {
     // token이 expired 되었는지 확인
 
     const updatedTime = dayjs(token.updatedAt);
-    const expirationTime = updatedTime.add(TOKEN_EXPIRES_IN_HOURS, 'h');
+    const expirationTime = updatedTime.add(TOKEN_EXPIRES_IN_YEARS, 'y');
 
     const now = dayjs(new Date());
 

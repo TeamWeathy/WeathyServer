@@ -1,5 +1,6 @@
 const { DailyWeather, Weathy } = require('../models');
 const Sequelize = require('sequelize');
+const { literal } = require('sequelize');
 
 module.exports = {
     getValidCalendarOverviewList: async (userId, startDate, endDate) => {
@@ -16,13 +17,13 @@ module.exports = {
                                 [Op.lte]: endDate
                             }
                         }
-                    },
-                    order: [['date', 'ASC'] ]
+                    }
                 }
             ],
             where: {
                 user_id: userId
-            }
+            },
+            order: literal('DailyWeather.date ASC')
         });
         let validCalendarOverviewList = [];
         for (let i = 0; i < weathies.length; ++i) {

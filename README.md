@@ -80,3 +80,5 @@ open weather api를 사용해서 날씨를 수집하고 해당 날씨에 대해 
 - 김자현 : 스키마 설계, DB 권한 및 계정 , Calendar, Weather API 개발 및 테스트코드 작성  
 이외의 API 설계, 코드 리뷰 등은 함께 하였음!
 
+### API 명세서
+[API 명세서 링크](https://github.com/TeamWeathy/WeathyServer/wiki)

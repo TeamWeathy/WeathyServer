@@ -16,7 +16,8 @@ module.exports = {
                                 [Op.lte]: endDate
                             }
                         }
-                    }
+                    },
+                    order: [['date', 'ASC'] ]
                 }
             ],
             where: {

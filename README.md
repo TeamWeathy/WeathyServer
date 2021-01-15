@@ -1,8 +1,11 @@
 # WeathyServer
+
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-3-blue.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
-☀️웨디 서버파트
+
+## 나에게 돌아오는 맞춤 서비스, Weathy 🌤
+<img src="https://imgur.com/IeuvIFO.png" width="750">
 
 ## Contributors ✨
 
@@ -60,19 +63,22 @@
 ```
 
 ### ER Diagram
-![image](https://user-images.githubusercontent.com/22928068/103475327-a4108280-4def-11eb-8d7b-0063b61ebb7b.png)
+<img src=https://imgur.com/fIjtbo3.png width="550">
 
 
 ### 서버 아키텍쳐
-<img width="1282" alt="스크린샷 2021-01-03 오후 6 13 24" src="https://user-images.githubusercontent.com/22928068/103475300-601d7d80-4def-11eb-98c9-c04ab3d90770.png">
+<img src=https://imgur.com/2hunZHg.png width="750">
 
 
 ### 핵심 기능 설명
-Open weather api 를 사용하여 날씨를 수집하고, 해당 날씨에 사용자 의상 착의를 기록하여 사용자에게 날씨 맞춤 의상을 추천해준다.
+open weather api를 사용해서 날씨를 수집하고 해당 날씨에 대해 사용자가 자신의 옷차림과 상태를 기록한다.  
+기록된 데이터를 바탕으로 오늘 날씨와 비슷한 날씨의 기록 데이터를 가져와 날씨 판단에 있어 비교척도를 제공해준다.
 
 ### 팀별 역할 분담
-- 신연상 : API 위키 문서 관리, Login, User, CLothes API 개발 및 테스트코드 작성
+- 신연상 : API 위키 문서 관리, Login, User, Clothes API 개발 및 테스트코드 작성
 - 최선욱 : Open Weather Batch 프로그램 개발, Weathy API 개발 및 테스트코드 작성
 - 김자현 : 스키마 설계, DB 권한 및 계정 , Calendar, Weather API 개발 및 테스트코드 작성  
 이외의 API 설계, 코드 리뷰 등은 함께 하였음!
 
+### API 명세서
+[API 명세서 링크](https://github.com/TeamWeathy/WeathyServer/wiki)

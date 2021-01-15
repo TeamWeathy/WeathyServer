@@ -25,12 +25,19 @@ const checkTokenExpired = async (token) => {
 
 const getUserIdByToken = async (token) => {
     // sequalizer에서 token으로 user_id 가져오기 expired 되었는지도 확인
+    console.log('getUserIdByToken:::' + token);
     const userToken = await Token.findOne({ where: { token: token } });
+    console.log('getUserIdByToken, userToken:::' + userToken);
     if (userToken === null) {
+        console.log('INVALID_TOKEN');
         throw Error(exception.INVALID_TOKEN);
     } else if (await checkTokenExpired(userToken)) {
+        console.log('EXPIRED_TOKEN');
         throw Error(exception.EXPIRED_TOKEN);
     } else {
+        console.log(
+            'getUserIdByToken, userToken.user_id:::' + userToken.user_id
+        );
         return userToken.user_id;
     }
 };
@@ -64,8 +71,10 @@ const refreshTokenTimeOfUser = async (user_id) => {
 const getUserId = async (token) => {
     try {
         const userId = await getUserIdByToken(token);
+        console.log('getUserId, userId:::' + userId);
         return userId;
     } catch (error) {
+        console.log('getUserId, INVALID_TOKEN');
         throw Error(exception.INVALID_TOKEN);
     }
 };
@@ -79,6 +88,7 @@ const tokenMiddleware = async (req, res, next) => {
     }
 
     try {
+        console.log('tokenMiddleware token:::' + token);
         const userId = await getUserId(token);
         req.userId = userId;
         await refreshTokenTimeOfUser(userId);

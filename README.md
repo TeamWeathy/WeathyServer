@@ -1,10 +1,11 @@
 # WeathyServer
-## 나에게 돌아오는 맞춤 서비스, Weathy 🌤
-<img src="https://imgur.com/IeuvIFO.png" width="750">
 
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-3-blue.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
+
+## 나에게 돌아오는 맞춤 서비스, Weathy 🌤
+<img src="https://imgur.com/IeuvIFO.png" width="750">
 
 ## Contributors ✨
 

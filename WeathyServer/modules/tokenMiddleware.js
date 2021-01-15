@@ -36,8 +36,9 @@ const getUserIdByToken = async (token) => {
 };
 
 const refreshTokenTimeOfUser = async (user_id) => {
+    const transaction = await sequelize.transaction();
+
     try {
-        const transaction = await sequelize.transaction();
         // Sequalizer에서 Token (시간만) 업데이트 하는 코드
         const userToken = await Token.findOne({ where: { user_id: user_id } });
         const token = userToken.token;

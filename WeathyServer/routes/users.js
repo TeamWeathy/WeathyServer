@@ -11,7 +11,11 @@ router.post('/', userController.createUser);
 router.put('/:userId', tokenMiddleware, userController.modifyUser);
 router.get('/:userId/clothes', tokenMiddleware, clothesController.getClothes);
 router.post('/:userId/clothes', tokenMiddleware, clothesController.addClothes);
-router.delete('/:userId/clothes', tokenMiddleware, clothesController.deleteClothes);
+router.delete(
+    '/:userId/clothes',
+    tokenMiddleware,
+    clothesController.deleteClothes
+);
 
 router.get(
     '/:userId/weathy/recommend',

@@ -51,15 +51,21 @@ module.exports = {
     refreshTokenValueOfUser: async (user_id) => {
         const token = generateToken(user_id);
         // Sequalizer에서 Token 업데이트 하는 코드 추가
+        console.log('tokenService/refreshTokenValue:::' + token);
         await Token.update({ token: token }, { where: { user_id: user_id } });
+        const testToken = Token.findOne({ where: { user_id: user_id } });
+        console.log('After update:::' + testToken.token);
         return token;
     },
     refreshTokenTimeOfUser: async (user_id) => {
-        const userToken = await Token.findOne({where: {user_id: user_id}});
+        const userToken = await Token.findOne({ where: { user_id: user_id } });
         const token = userToken.token;
         const fakeToken = generateToken(user_id);
-        await Token.update({ token: fakeToken }, { where: {user_id: user_id}});
-        await Token.update({ token: token }, { where: {user_id: user_id}});
+        await Token.update(
+            { token: fakeToken },
+            { where: { user_id: user_id } }
+        );
+        await Token.update({ token: token }, { where: { user_id: user_id } });
         return token;
     },
     createTokenOfUser: async (user_id) => {

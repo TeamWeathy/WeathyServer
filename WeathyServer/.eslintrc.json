@@ -4,7 +4,7 @@
       "prettier"
     ],
     "env": {
-      "express":true,
+      // "express":true,
       "node": true,
       "jest": true,
       "mocha": true,

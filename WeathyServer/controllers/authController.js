@@ -14,7 +14,7 @@ module.exports = {
         try {
             const user = await userService.getUserByAccount(uuid);
             const token = await tokenService.refreshTokenValueOfUser(user.id);
-
+            console.log('Login API Response token:::' + token);
             return res.status(statusCode.OK).json({
                 user: {
                     id: user.id,

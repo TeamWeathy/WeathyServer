@@ -6,8 +6,6 @@ const { locationService, weatherService } = require('../services');
 
 module.exports = {
     getWeatherByLocation: async (req, res, next) => {
-        // skip token validation
-
         const { lat, lon } = req.query;
         let { code, date } = req.query;
 

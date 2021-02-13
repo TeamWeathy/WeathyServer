@@ -1,7 +1,5 @@
-const cryptoRandomString = require('crypto-random-string');
-const { User, Token } = require('../models');
+const { User } = require('../models');
 const exception = require('../modules/exception');
-const { isValidTokenById } = require('../services/tokenService');
 const { createDefaultClothes } = require('../services/clothesService');
 
 module.exports = {
@@ -35,19 +33,9 @@ module.exports = {
         await createDefaultClothes(user.id);
         return user;
     },
-    modifyUserById: async (token, userId, nickname) => {
-        // token과 userId로 valid한지 체크하고, nickname으로 변경
-        const flag = await isValidTokenById(userId, token);
-        if (!flag) {
-            // 토큰이 맞지 않음. 잘못된 요청임
-            throw Error(exception.MISMATCH_TOKEN);
-        } else {
-            await User.update(
-                { nickname: nickname },
-                { where: { id: userId } }
-            );
-            const user = await User.findOne({ where: { id: userId } });
-            return user;
-        }
+    modifyUserById: async (userId, nickname) => {
+        await User.update({ nickname: nickname }, { where: { id: userId } });
+        const user = await User.findOne({ where: { id: userId } });
+        return user;
     }
 };

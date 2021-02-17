@@ -2,43 +2,43 @@ const express = require('express');
 const router = express.Router();
 
 const weathyController = require('../controllers/weathyController');
-const { tokenCheck, tokenUpdate } = require('../modules/tokenMiddleware');
+const { validateToken, updateToken } = require('../modules/tokenMiddleware');
 const userController = require('../controllers/userController');
 const clothesController = require('../controllers/clothesController');
 const calendarController = require('../controllers/calendarController');
 
 router.post('/', userController.createUser);
-router.put('/:userId', tokenCheck, userController.modifyUser, tokenUpdate);
+router.put('/:userId', validateToken, userController.modifyUser, updateToken);
 router.get(
     '/:userId/clothes',
-    tokenCheck,
+    validateToken,
     clothesController.getClothes,
-    tokenUpdate
+    updateToken
 );
 router.post(
     '/:userId/clothes',
-    tokenCheck,
+    validateToken,
     clothesController.addClothes,
-    tokenUpdate
+    updateToken
 );
 router.delete(
     '/:userId/clothes',
-    tokenCheck,
+    validateToken,
     clothesController.deleteClothes,
-    tokenUpdate
+    updateToken
 );
 
 router.get(
     '/:userId/weathy/recommend',
-    tokenCheck,
+    validateToken,
     weathyController.getRecommendedWeathy,
-    tokenUpdate
+    updateToken
 );
 router.get(
     '/:userId/calendar',
-    tokenCheck,
+    validateToken,
     calendarController.getCalendarOverviews,
-    tokenUpdate
+    updateToken
 );
 
 module.exports = router;

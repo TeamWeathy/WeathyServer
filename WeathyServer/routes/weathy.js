@@ -2,20 +2,20 @@ const express = require('express');
 const router = express.Router();
 
 const weathyController = require('../controllers/weathyController');
-const { tokenCheck, tokenUpdate } = require('../modules/tokenMiddleware');
+const { validateToken, updateToken } = require('../modules/tokenMiddleware');
 
-router.get('/', tokenCheck, weathyController.getWeathy, tokenUpdate);
-router.post('/', tokenCheck, weathyController.createWeathy, tokenUpdate);
+router.get('/', validateToken, weathyController.getWeathy, updateToken);
+router.post('/', validateToken, weathyController.createWeathy, updateToken);
 router.put(
     '/:weathyId',
-    tokenCheck,
+    validateToken,
     weathyController.modifyWeathy,
-    tokenUpdate
+    updateToken
 );
 router.delete(
     '/:weathyId',
-    tokenCheck,
+    validateToken,
     weathyController.deleteWeathy,
-    tokenUpdate
+    updateToken
 );
 module.exports = router;

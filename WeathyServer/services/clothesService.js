@@ -19,11 +19,11 @@ const setClothesForm = async () => {
 };
 
 async function getClothesByUserId(userId) {
-    const returnCloset = new Object();
+    const responseCloset = new Object();
     const clothesCategories = await ClothesCategory.findAll();
 
     for (const category of clothesCategories) {
-        const tempCloset = await Clothes.findAll({
+        const categoryClothes = await Clothes.findAll({
             where: {
                 user_id: userId,
                 category_id: category.id,
@@ -34,19 +34,20 @@ async function getClothesByUserId(userId) {
                 ['id', 'DESC']
             ]
         });
-        const temp = new Object();
-        temp.categoryId = category.id;
-        const tempClothesList = new Array();
-        await tempCloset.forEach((element) => {
-            const tempClothes = new Object();
-            tempClothes.id = element.id;
-            tempClothes.name = element.name;
-            tempClothesList.push(tempClothes);
+
+        const categoryCloset = new Object();
+        categoryCloset.categoryId = category.id;
+        const categoryClothesList = new Array();
+        await categoryClothes.forEach((element) => {
+            const clothes = new Object();
+            clothes.id = element.id;
+            clothes.name = element.name;
+            categoryClothesList.push(clothes);
         });
-        temp.clothes = tempClothesList;
-        returnCloset[category.name] = temp;
+        categoryCloset.clothes = categoryClothesList;
+        responseCloset[category.name] = categoryCloset;
     }
-    return returnCloset;
+    return responseCloset;
 }
 
 async function getWeathyCloset(weathyId) {
@@ -93,22 +94,21 @@ async function getWeathyCloset(weathyId) {
 }
 
 async function addClothesByUserId(userId, category, name) {
-    // 이미 한 번 지워졌던 값인지 확인
+    // 이미 한 번 지워졌었던 값인지 확인하는 작업이 필요하다
     const alreadyClothes = await Clothes.findOne({
         where: { user_id: userId, category_id: category, name: name }
     });
 
-    if (alreadyClothes == null) {
+    if (alreadyClothes === null) {
         await Clothes.create({
             user_id: userId,
             category_id: category,
             name: name,
             is_deleted: 0
         });
+    } else if (alreadyClothes.is_deleted === 0) {
+        throw Error(exception.ALREADY_CLOTHES);
     } else {
-        if (alreadyClothes.is_deleted === 0) {
-            throw Error(exception.ALREADY_CLOTHES);
-        }
         await Clothes.update(
             { is_deleted: 0 },
             {
@@ -121,14 +121,14 @@ async function addClothesByUserId(userId, category, name) {
         );
     }
 
-    const returnCloset = new Object();
+    const responseCloset = new Object();
     const clothesCategories = await ClothesCategory.findAll();
 
-    for (const tempCategory of clothesCategories) {
-        const tempCloset = await Clothes.findAll({
+    for (const ca of clothesCategories) {
+        const categoryClothes = await Clothes.findAll({
             where: {
                 user_id: userId,
-                category_id: tempCategory.id,
+                category_id: ca.id,
                 is_deleted: 0
             },
             order: [
@@ -136,23 +136,23 @@ async function addClothesByUserId(userId, category, name) {
                 ['id', 'DESC']
             ]
         });
-        const temp = new Object();
-        temp.categoryId = tempCategory.id;
-        const tempClothesList = new Array();
-        await tempCloset.forEach((element) => {
-            const tempClothes = new Object();
-            tempClothes.id = element.id;
-            tempClothes.name = element.name;
-            tempClothesList.push(tempClothes);
+        const categoryCloset = new Object();
+        categoryCloset.categoryId = ca.id;
+        const categoryClothesList = new Array();
+        await categoryClothes.forEach((element) => {
+            const clothes = new Object();
+            clothes.id = element.id;
+            clothes.name = element.name;
+            categoryClothesList.push(clothes);
         });
-        if (tempCategory.id === category) {
-            temp.clothes = tempClothesList;
+        if (ca.id === category) {
+            categoryCloset.clothes = categoryClothesList;
         } else {
-            temp.clothes = [];
+            categoryCloset.clothes = [];
         }
-        returnCloset[tempCategory.name] = temp;
+        responseCloset[ca.name] = categoryCloset;
     }
-    return returnCloset;
+    return responseCloset;
 }
 
 async function deleteClothesByUserId(userId, clothesList) {
@@ -169,8 +169,8 @@ async function deleteClothesByUserId(userId, clothesList) {
         }
     );
 
-    const returnCloset = await getClothesByUserId(userId);
-    return returnCloset;
+    const responseCloset = await getClothesByUserId(userId);
+    return responseCloset;
 }
 
 async function createClothesByName(userId, category, name) {

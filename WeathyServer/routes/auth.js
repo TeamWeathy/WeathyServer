@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const authController = require('../controllers/authController');
-const { tokenUpdate } = require('../modules/tokenMiddleware');
+const { updateToken } = require('../modules/tokenMiddleware');
 
-router.post('/login', authController.login, tokenUpdate);
+router.post('/login', authController.login, updateToken);
 
 module.exports = router;

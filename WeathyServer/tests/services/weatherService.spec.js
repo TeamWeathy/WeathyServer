@@ -11,13 +11,13 @@ const assertDailyWeather = (dailyWeather) => {
     assert.strictEqual(dailyWeather.temperature.minTemp, 100);
 };
 
-const assertDailyWeatherWithClimate = (dailyWeather) => {
+const assertDailyWeatherWithClimateIconId = (dailyWeather) => {
     assert.strictEqual(dailyWeather.date.month, 1);
     assert.strictEqual(dailyWeather.date.day, 1);
     assert.strictEqual(dailyWeather.date.dayOfWeek, '금요일');
     assert.strictEqual(dailyWeather.temperature.maxTemp, -100);
     assert.strictEqual(dailyWeather.temperature.minTemp, 100);
-    assert.strictEqual(dailyWeather.climate.iconId, 1);
+    assert.strictEqual(dailyWeather.climateIconId, 1);
 };
 
 const assertHourlyWeather = (hourlyWeather) => {
@@ -44,16 +44,16 @@ describe('weather service test', function () {
             assert(dailyWeather == null);
         });
     });
-    describe('getDailyWeatherWithClimate test', function () {
-        it('getDailyWeatherWithClimate returns dailyWeatherWithClimate', async function () {
-            const dailyWeather = await weatherService.getDailyWeatherWithClimate(
+    describe('getDailyWeatherWithClimateIconId test', function () {
+        it('getDailyWeatherWithClimateIconId returns dailyWeatherWithClimate', async function () {
+            const dailyWeather = await weatherService.getDailyWeatherWithClimateIconId(
                 1100000000,
                 '2021-01-01'
             );
-            assertDailyWeatherWithClimate(dailyWeather);
+            assertDailyWeatherWithClimateIconId(dailyWeather);
         });
-        it('getDailyWeatherWithClimate returns null if not exists', async function () {
-            const dailyWeather = await weatherService.getDailyWeatherWithClimate(
+        it('getDailyWeatherWithClimateIconId returns null if not exists', async function () {
+            const dailyWeather = await weatherService.getDailyWeatherWithClimateIconId(
                 1100000000,
                 '2020-01-01'
             );

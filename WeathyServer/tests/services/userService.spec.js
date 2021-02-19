@@ -1,6 +1,5 @@
 const assert = require('assert');
 const { User, Clothes } = require('../../models');
-const exception = require('../../modules/exception');
 const {
     getUserByAccount,
     createUserByUuid,
@@ -19,9 +18,9 @@ describe('userService test', function () {
 
         it('if there is no user, exception NO_USER', async () => {
             const uuid = 'thisisnotuser';
-            assert.ok(async () => {
+            await assert.rejects(async () => {
                 await getUserByAccount(uuid);
-            }, exception.NO_USER);
+            });
         });
     });
 
@@ -43,9 +42,10 @@ describe('userService test', function () {
         it('if already uuid exists, exception ALRLEADY_USER', async () => {
             const uuid = 'test';
             const nickname = 'usertest';
-            assert.ok(async () => {
+
+            await assert.rejects(async () => {
                 await createUserByUuid(uuid, nickname);
-            }, exception.ALREADY_USER);
+            });
         });
     });
 
@@ -68,6 +68,7 @@ describe('userService test', function () {
             const nickname = 'yeonsang';
             await modifyUserById(userId, nickname);
             const user = await User.findOne({ where: { id: 1 } });
+
             assert.ok(user.nickname === 'yeonsang');
         });
     });

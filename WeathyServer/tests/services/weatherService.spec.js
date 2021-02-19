@@ -1,7 +1,6 @@
 const assert = require('assert');
 const dateUtils = require('../../utils/dateUtils');
 const { weatherService } = require('../../services');
-const exception = require('../../modules/exception');
 
 const assertDailyWeather = (dailyWeather) => {
     assert.strictEqual(dailyWeather.date.month, 1);
@@ -134,9 +133,9 @@ describe('weather service test', function () {
             assert(extraWeather.wind.value == 91.9);
         });
         it('getExtraDailyWeather throw error if not exists', async function () {
-            await assert.ok(async () => {
+            await assert.rejects(async () => {
                 await weatherService.getExtraDailyWeather(-2, '2020-01-01');
-            }, exception.NO_DATA);
+            });
         });
     });
 });

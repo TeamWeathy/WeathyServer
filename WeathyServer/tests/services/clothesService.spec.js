@@ -5,7 +5,6 @@ const {
     addClothesByUserId,
     deleteClothesByUserId
 } = require('../../services/clothesService');
-const exception = require('../../modules/exception');
 
 describe('clothesService test', function () {
     describe('getClothesByUserId test', () => {
@@ -39,9 +38,9 @@ describe('clothesService test', function () {
         });
 
         it('Second addition makes exception ALREADY_CLOTHES', async () => {
-            assert.ok(async () => {
+            await assert.rejects(async () => {
                 await addClothesByUserId(userId, category, name);
-            }, exception.ALREADY_CLOTHES);
+            });
         });
     });
 
@@ -53,7 +52,6 @@ describe('clothesService test', function () {
             });
             const deletedId = deletedBeforeClothes.id;
             clothes.push(deletedId);
-
             await deleteClothesByUserId(userId, clothes);
 
             const deletedAfterClothes = await Clothes.findOne({
@@ -69,17 +67,17 @@ describe('clothesService test', function () {
         }).timeout(15000);
 
         it('Second deletion makes exception NO_CLOTHES', async () => {
-            assert.ok(async () => {
+            await assert.rejects(async () => {
                 await deleteClothesByUserId(userId, clothes);
-            }, exception.NO_CLOTHES);
+            });
         });
 
-        it('When deleting other user clothes, makes exception NOT_AUTHORIZED_CLOTHES', async () => {
+        it("When deleting other user's clothes, throws error", async () => {
             const wrongUserId = userId + 1;
 
-            assert.ok(async () => {
+            await assert.rejects(async () => {
                 await deleteClothesByUserId(wrongUserId, clothes);
-            }, exception.NOT_AUTHORIZED_CLOTHES);
+            });
         });
     });
 });

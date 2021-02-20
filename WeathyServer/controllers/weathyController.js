@@ -137,7 +137,7 @@ module.exports = {
                 clothes,
                 stampId,
                 userId,
-                feedback
+                feedback || null
             );
 
             return res.status(sc.OK).json({
@@ -200,7 +200,7 @@ module.exports = {
                 code,
                 clothes,
                 stampId,
-                feedback
+                feedback || null
             );
 
             if (!weathy) throw Error(exception.NO_AUTHORITY);

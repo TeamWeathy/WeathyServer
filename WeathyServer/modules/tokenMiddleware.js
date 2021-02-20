@@ -1,7 +1,7 @@
 const createError = require('http-errors');
 
 const dayjs = require('dayjs');
-const { Token, sequelize } = require('../models');
+const { Token, sequelize, User } = require('../models');
 const sc = require('./statusCode');
 const exception = require('./exception');
 const { generateToken } = require('../utils/tokenUtils');
@@ -26,7 +26,7 @@ const checkTokenExpired = async (token) => {
 const getUserIdByToken = async (token) => {
     // sequalizer에서 token으로 user_id 가져오기 expired 되었는지도 확인
     console.log('getUserIdByToken:::' + token);
-    const userToken = await Token.findOne({ where: { token: token } });
+    const userToken = await Token.findOne({ where: { token } });
     console.log('getUserIdByToken, userToken:::' + userToken);
     if (userToken === null) {
         console.log('INVALID_TOKEN');
@@ -63,7 +63,7 @@ const refreshTokenTimeOfUser = async (user_id) => {
 
         await transaction.commit();
     } catch (err) {
-        await transaction.rollcack();
+        await transaction.rollback();
         throw Error(exception.SERVER_ERROR);
     }
 };

@@ -279,21 +279,6 @@ const findDailyWeatherByWeathy = async (
     return dailyWeather;
 };
 
-const getWeathyClimate = async (id) => {
-    const climate = await Climate.findOne({
-        where: {
-            icon_id: id
-        }
-    });
-    const iconId = climate.icon_id;
-    const description = climate.description;
-
-    return {
-        iconId,
-        description
-    };
-};
-
 const getWeathy = async (date, userId) => {
     const weathy = await getWeathyOnDate(date, userId);
 
@@ -311,27 +296,18 @@ const getWeathy = async (date, userId) => {
     if (!hourlyWeather) return null;
 
     const region = await locationService.getLocationByCode(code);
-
-    weathy.dailyWeather = dailyWeather;
-    weathy.hourlyWeather = hourlyWeather;
-    weathy.hourlyWeather.climate = await getWeathyClimate(
-        hourlyWeather.climate.iconId
-    );
-
     const closet = await clothesService.getWeathyCloset(weathy.id);
 
     return {
         weathy: {
             region,
             dailyWeather,
-            hourlyWeather: {
-                climate: hourlyWeather.climate,
-                pop: hourlyWeather.pop
-            },
+            hourlyWeather,
             closet,
             weathyId: weathy.id,
             stampId: weathy.emoji_id,
-            feedback: weathy.description || ''
+            feedback: weathy.description || null,
+            imgUrl: weathy.img_url || null
         }
     };
 };

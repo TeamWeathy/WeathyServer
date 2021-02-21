@@ -73,7 +73,7 @@ const getHourlyWeather = async (code, date, hour, timeFormat) => {
 module.exports = {
     getHourlyWeather,
     getDailyWeather,
-    getDailyWeatherWithClimate: async (code, date) => {
+    getDailyWeatherWithClimateIconId: async (code, date) => {
         const dailyWeather = await DailyWeather.findOne({
             where: { location_id: code, date: date }
         });
@@ -90,9 +90,7 @@ module.exports = {
                 maxTemp: dailyWeather.temperature_max,
                 minTemp: dailyWeather.temperature_min
             },
-            climate: {
-                iconId: dailyWeather.climate_id
-            }
+            climateIconId: dailyWeather.climate_id
         };
     },
 

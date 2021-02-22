@@ -11,7 +11,7 @@ describe('tokenMiddleware test', function () {
         // userID 21 (Should not be Updated)
 
         const firstTestUserId = 22;
-        const secondTestUserId = 21;
+        const secondTestUserId = 25;
         let firstTestUserToken, secondTestUserToken;
 
         before('get values, and update tokens used for test', async () => {

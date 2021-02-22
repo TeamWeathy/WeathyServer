@@ -34,29 +34,26 @@ module.exports = {
         }
     },
     modifyUser: async (req, res, next) => {
-        const reqToken = req.get('x-access-token');
+        const token = res.locals.tokenValue;
         const { userId } = req.params;
         const { nickname } = req.body;
 
-        if (!userId || !nickname || !reqToken) {
+        if (!userId || !nickname) {
             next(createError(400));
         }
 
         try {
-            const user = await userService.modifyUserById(
-                reqToken,
-                userId,
-                nickname
-            );
+            const user = await userService.modifyUserById(userId, nickname);
 
-            return res.status(statusCode.OK).json({
+            res.status(statusCode.OK).json({
                 user: {
                     id: user.id,
                     nickname: user.nickname
                 },
-                token: reqToken,
+                token: token,
                 message: '유저 닉네임 변경 성공'
             });
+            next();
         } catch (error) {
             switch (error.message) {
                 case exception.INVALID_TOKEN:

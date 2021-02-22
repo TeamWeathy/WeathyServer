@@ -1,5 +1,4 @@
 const createError = require('http-errors');
-
 const sc = require('../modules/statusCode');
 const weathyService = require('../services/weathyService');
 const dayjs = require('dayjs');
@@ -13,15 +12,6 @@ module.exports = {
         const { code, date } = req.query;
         const { userId } = req.params;
         const dateRegex = /^(19|20)\d{2}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[0-1])$/;
-
-        if (userId != req.userId) {
-            return next(
-                createError(
-                    sc.BAD_REQUEST,
-                    'Parameter Error: userId와 Token이 일치하지 않음'
-                )
-            );
-        }
 
         const isExistWeather = await weatherService.getDailyWeather(code, date);
 
@@ -42,13 +32,15 @@ module.exports = {
             );
 
             if (!recommendedWeathy) {
-                return res.status(sc.NO_CONTENTS).json({});
+                res.status(sc.NO_CONTENTS).json({});
+                next();
+            } else {
+                res.status(sc.OK).json({
+                    ...recommendedWeathy,
+                    message: '추천 웨디 조회 성공'
+                });
+                next();
             }
-
-            return res.status(sc.OK).json({
-                ...recommendedWeathy,
-                message: '추천 웨디 조회 성공'
-            });
         } catch (error) {
             switch (error.message) {
                 default:
@@ -59,7 +51,7 @@ module.exports = {
 
     getWeathy: async (req, res, next) => {
         const { date } = req.query;
-        const userId = req.userId;
+        const userId = res.locals.userId;
         const dateRegex = /^(19|20)\d{2}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[0-1])$/;
         const isPast = dayjs().isAfter(dayjs(date));
 
@@ -76,13 +68,15 @@ module.exports = {
             const weathy = await weathyService.getWeathy(date, userId);
 
             if (!weathy) {
-                return res.status(sc.NO_CONTENTS).json({});
+                res.status(sc.NO_CONTENTS).json({});
+                next();
+            } else {
+                res.status(sc.OK).json({
+                    ...weathy,
+                    message: '웨디 기록 조회 성공'
+                });
+                next();
             }
-
-            return res.status(sc.OK).json({
-                ...weathy,
-                message: '웨디 기록 조회 성공'
-            });
         } catch (error) {
             switch (error.message) {
                 default:
@@ -95,15 +89,16 @@ module.exports = {
         const { date, code, clothes, stampId, feedback, userId } = req.body;
         const dateRegex = /^(19|20)\d{2}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[0-1])$/;
 
-        if (!dateRegex.test(date) || !code || !clothes || !stampId) {
+        if (!dateRegex.test(date) || !code || !clothes || !stampId || !userId) {
             return next(createError(sc.BAD_REQUEST, 'Parameter Error'));
         }
 
-        if (userId != req.userId) {
+        const resUserId = res.locals.userId;
+        if (resUserId !== userId) {
             return next(
                 createError(
-                    sc.NO_AUTHORITY,
-                    'Autority Error: Token 또는 UserId를 확인해주세요'
+                    sc.INVALID_ACCOUNT,
+                    'Token userId and body userId mismatch'
                 )
             );
         }
@@ -140,9 +135,10 @@ module.exports = {
                 feedback
             );
 
-            return res.status(sc.OK).json({
+            res.status(sc.OK).json({
                 message: '웨디 기록 성공'
             });
+            next();
         } catch (error) {
             logger.error(error.stack);
 
@@ -177,7 +173,8 @@ module.exports = {
     modifyWeathy: async (req, res, next) => {
         const { weathyId } = req.params;
         const { code, clothes, stampId, feedback } = req.body;
-        const userId = req.userId;
+
+        const userId = res.locals.userId;
 
         try {
             const checkOwnerClothes = await weathyService.checkOwnerClothes(
@@ -205,9 +202,10 @@ module.exports = {
 
             if (!weathy) throw Error(exception.NO_AUTHORITY);
 
-            return res.status(sc.OK).json({
+            res.status(sc.OK).json({
                 message: '웨디 기록 수정 완료'
             });
+            next();
         } catch (err) {
             switch (err.message) {
                 case exception.NO_DAILY_WEATHER:
@@ -232,7 +230,7 @@ module.exports = {
 
     deleteWeathy: async (req, res, next) => {
         const { weathyId } = req.params;
-        const userId = req.userId;
+        const userId = res.locals.userId;
 
         try {
             const deletedWeathy = await weathyService.deleteWeathy(
@@ -240,11 +238,15 @@ module.exports = {
                 userId
             );
 
-            if (!deletedWeathy) return res.status(sc.NO_CONTENTS).json({});
-
-            return res.status(sc.OK).json({
-                message: '웨디 기록 삭제 성공'
-            });
+            if (!deletedWeathy) {
+                res.status(sc.NO_CONTENTS).json({});
+                next();
+            } else {
+                res.status(sc.OK).json({
+                    message: '웨디 기록 삭제 성공'
+                });
+                next();
+            }
         } catch (err) {
             switch (err) {
                 default:

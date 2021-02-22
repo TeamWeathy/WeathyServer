@@ -2,26 +2,43 @@ const express = require('express');
 const router = express.Router();
 
 const weathyController = require('../controllers/weathyController');
-const tokenMiddleware = require('../modules/tokenMiddleware');
+const { validateToken, updateToken } = require('../modules/tokenMiddleware');
 const userController = require('../controllers/userController');
 const clothesController = require('../controllers/clothesController');
 const calendarController = require('../controllers/calendarController');
 
 router.post('/', userController.createUser);
-router.put('/:userId', tokenMiddleware, userController.modifyUser);
-router.get('/:userId/clothes', tokenMiddleware, clothesController.getClothes);
-router.post('/:userId/clothes', tokenMiddleware, clothesController.addClothes);
+router.put('/:userId', validateToken, userController.modifyUser, updateToken);
+router.get(
+    '/:userId/clothes',
+    validateToken,
+    clothesController.getClothes,
+    updateToken
+);
+router.post(
+    '/:userId/clothes',
+    validateToken,
+    clothesController.addClothes,
+    updateToken
+);
 router.delete(
     '/:userId/clothes',
-    tokenMiddleware,
-    clothesController.deleteClothes
+    validateToken,
+    clothesController.deleteClothes,
+    updateToken
 );
 
 router.get(
     '/:userId/weathy/recommend',
-    tokenMiddleware,
-    weathyController.getRecommendedWeathy
+    validateToken,
+    weathyController.getRecommendedWeathy,
+    updateToken
 );
-router.get('/:userId/calendar', calendarController.getCalendarOverviews);
+router.get(
+    '/:userId/calendar',
+    validateToken,
+    calendarController.getCalendarOverviews,
+    updateToken
+);
 
 module.exports = router;

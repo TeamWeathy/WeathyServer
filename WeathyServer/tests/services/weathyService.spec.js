@@ -1,5 +1,4 @@
 const assert = require('assert');
-const dateUtils = require('../../utils/dateUtils');
 const weathyService = require('../../services/weathyService');
 const exception = require('../../modules/exception');
 const { Weathy, WeathyClothes, DailyWeather } = require('../../models');

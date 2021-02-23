@@ -1,21 +1,18 @@
 const createError = require('http-errors');
-const exception = require('../modules/exception');
 const statusCode = require('../modules/statusCode');
 const dateUtils = require('../utils/dateUtils');
-const { tokenService, calendarService } = require('../services');
+const { calendarService } = require('../services');
 
 module.exports = {
     getCalendarOverviews: async (req, res, next) => {
         const { userId } = req.params;
-        const token = req.get('x-access-token');
         const { start, end } = req.query;
 
-        if (!token || !start || !end) {
+        if (!start || !end) {
             return next(createError(400));
         }
 
         try {
-            await tokenService.validateTokenWithUserId(userId, token);
             const validCalendarOverviewList = await calendarService.getValidCalendarOverviewList(
                 userId,
                 start,
@@ -37,15 +34,13 @@ module.exports = {
                 }
                 curDay.setDate(curDay.getDate() + 1);
             }
-            return res.status(statusCode.OK).json({
+            res.status(statusCode.OK).json({
                 calendarOverviewList,
                 message: '캘린더 월 정보 조회 성공'
             });
+            next();
         } catch (error) {
             switch (error.message) {
-                case exception.INVALID_TOKEN:
-                case exception.MISMATCH_TOKEN:
-                    return next(createError(401));
                 default:
                     return next(createError(500));
             }

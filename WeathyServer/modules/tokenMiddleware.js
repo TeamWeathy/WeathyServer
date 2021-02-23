@@ -1,109 +1,92 @@
 const createError = require('http-errors');
-
 const dayjs = require('dayjs');
 const { Token, sequelize } = require('../models');
 const sc = require('./statusCode');
 const exception = require('./exception');
-const { generateToken } = require('../utils/tokenUtils');
+const { generateToken, isUserOwnerOfToken } = require('../utils/tokenUtils');
 
-const TOKEN_EXPIRES_IN_YEARS = 1; // 토큰 유효 기간 (1시간)
+const TOKEN_EXPIRES_IN_DAYS = 15; // 토큰 유효 기간 (15일)
 
-const checkTokenExpired = async (token) => {
-    // token이 expired 되었는지 확인
-
-    const updatedTime = dayjs(token.updatedAt);
-    const expirationTime = updatedTime.add(TOKEN_EXPIRES_IN_YEARS, 'y');
-
-    const now = dayjs(new Date());
-
-    if (now.isBefore(expirationTime)) {
-        return false;
-    } else {
-        return true;
+const validateToken = async (req, res, next) => {
+    // 토큰 검사
+    // 1. header에 token이 있는지 확인
+    const token = req.headers['x-access-token'];
+    if (!token) {
+        return next(createError(sc.BAD_REQUEST, 'No Token'));
     }
-};
 
-const getUserIdByToken = async (token) => {
-    // sequalizer에서 token으로 user_id 가져오기 expired 되었는지도 확인
-    console.log('getUserIdByToken:::' + token);
-    const userToken = await Token.findOne({ where: { token } });
-    console.log('getUserIdByToken, userToken:::' + userToken);
+    // 2. 이 토큰이 유효한지 확인
+    const userToken = await Token.findOne({ where: { token: token } });
+    // 2-1. token 객체가 DB에 존재해야 한다
     if (userToken === null) {
-        console.log('INVALID_TOKEN');
-        throw Error(exception.INVALID_TOKEN);
-    } else if (await checkTokenExpired(userToken)) {
-        console.log('EXPIRED_TOKEN');
-        throw Error(exception.EXPIRED_TOKEN);
+        return next(createError(sc.BAD_REQUEST, 'No Matching Token on DB'));
+    } else if (!isUserOwnerOfToken(userToken.user_id, token)) {
+        // 2-2. 객체의 userId와 토큰에 포함된 id가 같아야 한다
+        return next(createError(sc.INVALID_ACCOUNT, 'Token user_id is wrong'));
     } else {
-        console.log(
-            'getUserIdByToken, userToken.user_id:::' + userToken.user_id
+        // 2-3. param에 userId가 있다면, 토큰에 포함된 id와 일치하는지 확인. 없으면 그냥 넘어간다
+        // 가정: param에 userId가 없다면, 그 API는 param에 userId를 요구하지 않는 것이다
+        // param에 userId가 있어야 하는데 없는 경우는, service 단에서 error를 처리해야 함
+        const { userId } = req.params;
+        if (userId && !isUserOwnerOfToken(userId, token)) {
+            return next(
+                createError(
+                    sc.INVALID_ACCOUNT,
+                    'Param userId is different with Token'
+                )
+            );
+        }
+
+        // 2-4. token의 만료 기한이 지나지 않았어야 한다
+        const updatedTime = userToken.updatedAt;
+        const updatedTimeDayjs = dayjs(updatedTime);
+        const expirationTime = updatedTimeDayjs.add(
+            TOKEN_EXPIRES_IN_DAYS,
+            'days'
         );
-        return userToken.user_id;
+        const now = dayjs(new Date());
+        if (!now.isBefore(expirationTime)) {
+            return next(createError(sc.INVALID_ACCOUNT, 'Expired Token'));
+        }
     }
+
+    // 3. res.locals에 token 값과 userId 저장해 둠
+    res.locals.tokenValue = token;
+    res.locals.userId = userToken.user_id;
+    next();
 };
 
-const refreshTokenTimeOfUser = async (user_id) => {
+const updateToken = async (req, res) => {
+    // 토큰 업데이트
+    // 사용되면 return res.send() 에서 return을 뺄 것
     const transaction = await sequelize.transaction();
 
     try {
-        // Sequalizer에서 Token (시간만) 업데이트 하는 코드
-        const userToken = await Token.findOne({ where: { user_id: user_id } });
-        const token = userToken.token;
-        const fakeToken = generateToken(user_id);
+        const token = res.locals.tokenValue;
+
+        const userToken = await Token.findOne({ where: { token: token } });
+        const fakeToken = generateToken(userToken.user_id);
+
         await Token.update(
             { token: fakeToken },
-            { where: { user_id: user_id } },
+            { where: { user_id: userToken.user_id } },
             { transaction }
         );
         await Token.update(
             { token: token },
-            { where: { user_id: user_id } },
+            { where: { user_id: userToken.user_id } },
             { transaction }
         );
 
         await transaction.commit();
+        return res;
     } catch (err) {
         await transaction.rollback();
         throw Error(exception.SERVER_ERROR);
     }
 };
 
-const getUserId = async (token) => {
-    try {
-        const userId = await getUserIdByToken(token);
-        console.log('getUserId, userId:::' + userId);
-        return userId;
-    } catch (error) {
-        console.log('getUserId, INVALID_TOKEN');
-        throw Error(exception.INVALID_TOKEN);
-    }
+module.exports = {
+    validateToken,
+    updateToken
 };
-
-const tokenMiddleware = async (req, res, next) => {
-    // read the token from header
-    const token = req.headers['x-access-token'];
-    // token does not exist
-    if (!token) {
-        next(createError(sc.BAD_REQUEST));
-    }
-
-    try {
-        console.log('tokenMiddleware token:::' + token);
-        const userId = await getUserId(token);
-        req.userId = userId;
-        await refreshTokenTimeOfUser(userId);
-    } catch (error) {
-        switch (error.message) {
-            case exception.EXPIRED_TOKEN:
-            case exception.INVALID_TOKEN:
-                next(createError(sc.INVALID_ACCOUNT, 'Token Error'));
-                break;
-            default:
-                next(createError(sc.INTERNAL_SERVER_ERROR, 'Server Error'));
-                break;
-        }
-    }
-    next();
-};
-
-module.exports = tokenMiddleware;

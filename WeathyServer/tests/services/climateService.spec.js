@@ -1,6 +1,5 @@
 const assert = require('assert');
 const { climateService } = require('../../services');
-const exception = require('../../modules/exception');
 
 describe('climate service test', function () {
     describe('getClimate test', function () {
@@ -15,9 +14,9 @@ describe('climate service test', function () {
             assert.ok(climate_first.description != climate_second.description);
         });
         it('getClimateBy throws error if not exists', async function () {
-            await assert.ok(async () => {
+            await assert.rejects(async () => {
                 await climateService.getClimate(-2, 0);
-            }, exception.NO_DATA);
+            });
         });
     });
 });

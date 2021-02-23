@@ -19,6 +19,7 @@
     "morgan": "~1.9.1",
     "multer-s3": "^2.9.0",
     "mysql2": "^2.2.5",
+    "node-mocks-http": "^1.10.1",
     "request": "^2.88.2",
     "request-promise": "^4.2.6",
     "sequelize": "^6.3.5",

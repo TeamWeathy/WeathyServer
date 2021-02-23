@@ -14,26 +14,22 @@ module.exports = {
         }
 
         try {
+            let closet;
             if (!weathyid) {
-                const closet = await clothesService.getClothesByUserId(userId);
-                res.status(statusCode.OK).json({
-                    clothesNum: clothesNum,
-                    closet: closet,
-                    message: '옷 정보 조회 성공'
-                });
-                next();
+                closet = await clothesService.getClothesByUserId(userId);
             } else {
-                const closet = await clothesService.getClothesByWeathyId(
+                closet = await clothesService.getClothesByWeathyId(
                     userId,
                     weathyid
                 );
-                res.status(statusCode.OK).json({
-                    clothesNum: clothesNum,
-                    closet: closet,
-                    message: '옷 정보 조회 성공'
-                });
-                next();
             }
+
+            res.status(statusCode.OK).json({
+                clothesNum: clothesNum,
+                closet: closet,
+                message: '옷 정보 조회 성공'
+            });
+            next();
         } catch (error) {
             switch (error.message) {
                 default:

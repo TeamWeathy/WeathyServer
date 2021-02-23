@@ -2,8 +2,7 @@ const assert = require('assert');
 const weathyService = require('../../services/weathyService');
 const exception = require('../../modules/exception');
 const { Weathy, WeathyClothes, DailyWeather } = require('../../models');
-const { async } = require('crypto-random-string');
-
+const { sequelize } = require('../../models');
 const assertRegion = (region) => {
     assert.strictEqual(region.code, 1100000000);
     assert.strictEqual(region.name, '서울특별시');
@@ -202,6 +201,51 @@ describe('weathy service test', function () {
             assert.ok(modifedWeathy.emoji_id === 1);
             assert.ok(modifedWeathy.DailyWeather.location_id === code);
             assert.ok(result.count === 1);
+        });
+    });
+
+    describe('modifyImgField Test', async function () {
+        const userId = 1;
+        let weathyId;
+        before('Create Weathy', async function () {
+            const weathy = await Weathy.create({
+                user_id: 1,
+                dailyweather_id: 108,
+                emoji_id: 3,
+                description: 'hello',
+                img_url: null
+            });
+            weathyId = weathy.id;
+        });
+
+        after('Delete Weathy', async function () {
+            await Weathy.destroy({
+                where: {
+                    id: weathyId
+                }
+            });
+        });
+
+        it('Insert null into img_url', async function () {
+            await weathyService.modifyImgField(null, weathyId, userId);
+            const weathy = await Weathy.findOne({
+                where: {
+                    id: weathyId
+                }
+            });
+
+            assert.strictEqual(weathy.img_url, null);
+        });
+
+        it('Insert hello world into img_url', async function () {
+            const helloWorld = 'hello world!';
+            await weathyService.modifyImgField(helloWorld, weathyId, userId);
+            const weathy = await Weathy.findOne({
+                where: {
+                    id: weathyId
+                }
+            });
+            assert.strictEqual(weathy.img_url, helloWorld);
         });
     });
 });

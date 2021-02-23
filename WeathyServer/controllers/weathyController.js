@@ -250,6 +250,13 @@ module.exports = {
                             '웨디를 수정할 수 없습니다.'
                         )
                     );
+                case exception.DUPLICATION_WEATHY:
+                    return next(
+                        createError(
+                            sc.BAD_REQUEST,
+                            '잘못된 날짜에 Weathy 작성(중복된 웨디 작성)'
+                        )
+                    );
                 case exception.BAD_REQUEST:
                     return next(createError(sc.BAD_REQUEST, 'Parameter Error'));
                 default:

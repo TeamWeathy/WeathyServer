@@ -408,6 +408,9 @@ const modifyWeathy = async (
         if (err.message === exception.NO_DAILY_WEATHER) {
             throw Error(exception.NO_DAILY_WEATHER);
         }
+        if (err instanceof UniqueConstraintError) {
+            throw Error(exception.DUPLICATION_WEATHY);
+        }
         throw Error(exception.SERVER_ERROR);
     }
 };

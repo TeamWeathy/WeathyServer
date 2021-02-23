@@ -49,7 +49,7 @@ module.exports = {
             console.log(error.message);
             switch (error.message) {
                 case exception.ALREADY_CLOTHES:
-                    next(createError(400));
+                    next(createError(403));
                     break;
                 default:
                     next(createError(500));

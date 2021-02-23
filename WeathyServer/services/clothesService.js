@@ -36,7 +36,10 @@ async function getClothesByUserId(token, userId) {
                     category_id: category.id,
                     is_deleted: 0
                 },
-                order: [['updated_at', 'DESC'],['id', 'DESC'] ]
+                order: [
+                    ['updated_at', 'DESC'],
+                    ['id', 'DESC']
+                ]
             });
             const temp = new Object();
             temp.categoryId = category.id;
@@ -150,35 +153,38 @@ async function addClothesByUserId(token, userId, category, name) {
         return returnClothesList;
         */
 
-       const returnCloset = new Object();
-       const clothesCategories = await ClothesCategory.findAll();
-    
-       for (const tempCategory of clothesCategories) {
-           const tempCloset = await Clothes.findAll({
-               where: {
-                   user_id: userId,
-                   category_id: tempCategory.id,
-                   is_deleted: 0
-               },
-               order: [['updated_at', 'DESC'],['id', 'DESC'] ]
-           });
-           const temp = new Object();
-           temp.categoryId = tempCategory.id;
-           const tempClothesList = new Array();
-           await tempCloset.forEach((element) => {
-               const tempClothes = new Object();
-               tempClothes.id = element.id;
-               tempClothes.name = element.name;
-               tempClothesList.push(tempClothes);
-           });
-           if(tempCategory.id === category) {
-               temp.clothes = tempClothesList;
-           } else {
-               temp.clothes = [];
-           }
-           returnCloset[tempCategory.name] = temp;
-       }
-       return returnCloset;
+        const returnCloset = new Object();
+        const clothesCategories = await ClothesCategory.findAll();
+
+        for (const tempCategory of clothesCategories) {
+            const tempCloset = await Clothes.findAll({
+                where: {
+                    user_id: userId,
+                    category_id: tempCategory.id,
+                    is_deleted: 0
+                },
+                order: [
+                    ['updated_at', 'DESC'],
+                    ['id', 'DESC']
+                ]
+            });
+            const temp = new Object();
+            temp.categoryId = tempCategory.id;
+            const tempClothesList = new Array();
+            await tempCloset.forEach((element) => {
+                const tempClothes = new Object();
+                tempClothes.id = element.id;
+                tempClothes.name = element.name;
+                tempClothesList.push(tempClothes);
+            });
+            if (tempCategory.id === category) {
+                temp.clothes = tempClothesList;
+            } else {
+                temp.clothes = [];
+            }
+            returnCloset[tempCategory.name] = temp;
+        }
+        return returnCloset;
     }
 }
 
@@ -229,8 +235,8 @@ async function createDefaultClothes(userId) {
     await createClothesByName(userId, 3, '코트');
     await createClothesByName(userId, 3, '점퍼');
     await createClothesByName(userId, 4, '목도리');
-    await createClothesByName(userId ,4, '장갑');
-    await createClothesByName(userId, 4, '모자');    
+    await createClothesByName(userId, 4, '장갑');
+    await createClothesByName(userId, 4, '모자');
 }
 
 module.exports = {

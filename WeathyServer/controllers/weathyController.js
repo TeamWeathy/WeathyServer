@@ -92,23 +92,33 @@ module.exports = {
     },
 
     createWeathy: async (req, res, next) => {
-        const { date, code, clothes, stampId, feedback, userId } = req.body;
-        const dateRegex = /^(19|20)\d{2}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[0-1])$/;
-
-        if (!dateRegex.test(date) || !code || !clothes || !stampId) {
-            return next(createError(sc.BAD_REQUEST, 'Parameter Error'));
-        }
-
-        if (userId != req.userId) {
-            return next(
-                createError(
-                    sc.NO_AUTHORITY,
-                    'Autority Error: Token 또는 UserId를 확인해주세요'
-                )
-            );
-        }
-
         try {
+            if (!req.body.weathy) throw Error(exception.BAD_REQUEST);
+
+            const weathyParams = JSON.parse(req.body.weathy);
+            const {
+                date,
+                code,
+                clothes,
+                stampId,
+                feedback,
+                userId
+            } = weathyParams;
+            const dateRegex = /^(19|20)\d{2}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[0-1])$/;
+            const imgUrl = req.file ? req.file.location : null;
+
+            if (!dateRegex.test(date) || !code || !clothes || !stampId)
+                throw Error(exception.BAD_REQUEST);
+
+            if (userId != req.userId) {
+                return next(
+                    createError(
+                        sc.NO_AUTHORITY,
+                        'Autority Error: Token 또는 UserId를 확인해주세요'
+                    )
+                );
+            }
+
             const dailyWeatherId = await weatherService.getDailyWeatherId(
                 code,
                 date
@@ -132,16 +142,18 @@ module.exports = {
                 );
             }
 
-            await weathyService.createWeathy(
+            const weathyId = await weathyService.createWeathy(
                 dailyWeatherId,
                 clothes,
                 stampId,
                 userId,
-                feedback || null
+                feedback || null,
+                imgUrl || null
             );
 
             return res.status(sc.OK).json({
-                message: '웨디 기록 성공'
+                message: '웨디 기록 성공',
+                weathyId
             });
         } catch (error) {
             logger.error(error.stack);
@@ -168,6 +180,9 @@ module.exports = {
                             'Autority Error: Clothes 권한 없음'
                         )
                     );
+                case exception.BAD_REQUEST:
+                    return next(createError(sc.BAD_REQUEST, 'Parameter Error'));
+
                 default:
                     return next(createError(sc.INTERNAL_SERVER_ERROR));
             }
@@ -175,11 +190,15 @@ module.exports = {
     },
 
     modifyWeathy: async (req, res, next) => {
-        const { weathyId } = req.params;
-        const { code, clothes, stampId, feedback } = req.body;
-        const userId = req.userId;
-
         try {
+            if (!req.body.weathy) throw Error(exception.BAD_REQUEST);
+
+            const weathyParams = JSON.parse(req.body.weathy);
+            const { weathyId } = req.params;
+            const { code, clothes, stampId, feedback, isDelete } = weathyParams;
+            const imgUrl = req.file && !isDelete ? req.file.location : null;
+            const userId = req.userId;
+
             const checkOwnerClothes = await weathyService.checkOwnerClothes(
                 clothes,
                 userId
@@ -205,10 +224,20 @@ module.exports = {
 
             if (!weathy) throw Error(exception.NO_AUTHORITY);
 
+            if (imgUrl || isDelete) {
+                // 삭제 또는 수정 시
+                await weathyService.modifyImgField(
+                    imgUrl || null,
+                    weathyId,
+                    userId
+                );
+            }
+
             return res.status(sc.OK).json({
                 message: '웨디 기록 수정 완료'
             });
         } catch (err) {
+            logger.error(err.stack);
             switch (err.message) {
                 case exception.NO_DAILY_WEATHER:
                     return next(
@@ -224,6 +253,8 @@ module.exports = {
                             '웨디를 수정할 수 없습니다.'
                         )
                     );
+                case exception.BAD_REQUEST:
+                    return next(createError(sc.BAD_REQUEST, 'Parameter Error'));
                 default:
                     return next(createError(sc.INTERNAL_SERVER_ERROR));
             }

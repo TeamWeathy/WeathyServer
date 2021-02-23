@@ -1,7 +1,7 @@
 const createError = require('http-errors');
 
 const dayjs = require('dayjs');
-const { Token, sequelize, User } = require('../models');
+const { Token, sequelize } = require('../models');
 const sc = require('./statusCode');
 const exception = require('./exception');
 const { generateToken } = require('../utils/tokenUtils');

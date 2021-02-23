@@ -9,6 +9,10 @@ module.exports = (sequelize, DataTypes) => {
             description: {
                 type: DataTypes.STRING(500),
                 allowNull: true
+            },
+            img_url: {
+                type: DataTypes.STRING(500),
+                allowNull: true
             }
         },
         {

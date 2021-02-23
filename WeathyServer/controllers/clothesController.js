@@ -6,18 +6,34 @@ const { clothesService } = require('../services');
 module.exports = {
     getClothes: async (req, res, next) => {
         const { userId } = req.params;
+        const { weathyid } = req.query;
+        const clothesNum = await clothesService.getClothesNumByUserId(userId);
 
         if (!userId) {
             next(createError(400));
         }
 
         try {
-            const closet = await clothesService.getClothesByUserId(userId);
-            res.status(statusCode.OK).json({
-                closet: closet,
-                message: '옷 정보 조회 성공'
-            });
-            next();
+            if (!weathyid) {
+                const closet = await clothesService.getClothesByUserId(userId);
+                res.status(statusCode.OK).json({
+                    clothesNum: clothesNum,
+                    closet: closet,
+                    message: '옷 정보 조회 성공'
+                });
+                next();
+            } else {
+                const closet = await clothesService.getClothesByWeathyId(
+                    userId,
+                    weathyid
+                );
+                res.status(statusCode.OK).json({
+                    clothesNum: clothesNum,
+                    closet: closet,
+                    message: '옷 정보 조회 성공'
+                });
+                next();
+            }
         } catch (error) {
             switch (error.message) {
                 default:
@@ -39,8 +55,12 @@ module.exports = {
                 category,
                 name
             );
+            const clothesNum = await clothesService.getClothesNumByUserId(
+                userId
+            );
 
             res.status(statusCode.OK).json({
+                clothesNum: clothesNum,
                 clothesList: clothesList,
                 message: '옷 추가 성공'
             });
@@ -69,7 +89,11 @@ module.exports = {
                 userId,
                 clothes
             );
+            const clothesNum = await clothesService.getClothesNumByUserId(
+                userId
+            );
             res.status(statusCode.OK).json({
+                clothesNum: clothesNum,
                 closet: closet,
                 message: '옷 삭제 성공'
             });

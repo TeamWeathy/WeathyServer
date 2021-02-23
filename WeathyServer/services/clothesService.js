@@ -18,6 +18,16 @@ const setClothesForm = async () => {
     return closet;
 };
 
+async function getClothesNumByUserId(userId) {
+    const aliveClothes = await Clothes.findAndCountAll({
+        where: {
+            user_id: userId,
+            is_deleted: 0
+        }
+    });
+    return aliveClothes.count;
+}
+
 async function getClothesByUserId(userId) {
     const responseCloset = new Object();
     const clothesCategories = await ClothesCategory.findAll();
@@ -28,6 +38,61 @@ async function getClothesByUserId(userId) {
                 user_id: userId,
                 category_id: category.id,
                 is_deleted: 0
+            },
+            order: [
+                ['updated_at', 'DESC'],
+                ['id', 'DESC']
+            ]
+        });
+
+        const categoryCloset = new Object();
+        categoryCloset.categoryId = category.id;
+        const categoryClothesList = new Array();
+        await categoryClothes.forEach((element) => {
+            const clothes = new Object();
+            clothes.id = element.id;
+            clothes.name = element.name;
+            categoryClothesList.push(clothes);
+        });
+        categoryCloset.clothes = categoryClothesList;
+        responseCloset[category.name] = categoryCloset;
+    }
+    return responseCloset;
+}
+
+async function getClothesByWeathyId(userId, weathyId) {
+    const responseCloset = new Object();
+    const clothesCategories = await ClothesCategory.findAll();
+
+    const weathyClothes = await WeathyClothes.findAll({
+        where: {
+            weathy_id: weathyId
+        },
+        attributes: ['clothes_id']
+    });
+    const weathyClothesIdList = new Array();
+    await weathyClothes.forEach((e) => {
+        weathyClothesIdList.push(e.dataValues.clothes_id);
+    });
+
+    for (const category of clothesCategories) {
+        const categoryClothes = await Clothes.findAll({
+            where: {
+                [Op.or]: [
+                    {
+                        user_id: userId,
+                        category_id: category.id,
+                        is_deleted: 0
+                    },
+                    {
+                        user_id: userId,
+                        category_id: category.id,
+                        id: {
+                            [Op.in]: weathyClothesIdList
+                        },
+                        is_deleted: 1
+                    }
+                ]
             },
             order: [
                 ['updated_at', 'DESC'],
@@ -210,7 +275,9 @@ async function createDefaultClothes(userId) {
 }
 
 module.exports = {
+    getClothesNumByUserId,
     getClothesByUserId,
+    getClothesByWeathyId,
     addClothesByUserId,
     deleteClothesByUserId,
     getWeathyCloset,

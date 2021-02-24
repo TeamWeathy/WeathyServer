@@ -18,6 +18,49 @@ const setClothesForm = async () => {
     return closet;
 };
 
+const unionTwoCloset = (closet1, closet2) => {
+    const top1 = closet1.top.clothes;
+    const top2 = closet2.top.clothes;
+    const unionTop = top2.concat(top1).filter(function (cl) {
+        return this.has(cl.id) ? false : this.add(cl.id);
+    }, new Set());
+    const bottom1 = closet1.bottom.clothes;
+    const bottom2 = closet2.bottom.clothes;
+    const unionBottom = bottom2.concat(bottom1).filter(function (cl) {
+        return this.has(cl.id) ? false : this.add(cl.id);
+    }, new Set());
+    const outer1 = closet1.outer.clothes;
+    const outer2 = closet2.outer.clothes;
+    const unionOuter = outer2.concat(outer1).filter(function (cl) {
+        return this.has(cl.id) ? false : this.add(cl.id);
+    }, new Set());
+    const etc1 = closet1.etc.clothes;
+    const etc2 = closet2.etc.clothes;
+    const unionEtc = etc2.concat(etc1).filter(function (cl) {
+        return this.has(cl.id) ? false : this.add(cl.id);
+    }, new Set());
+
+    const unionCloset = {
+        top: {
+            categoryId: 1,
+            clothes: unionTop
+        },
+        bottom: {
+            categoryId: 2,
+            clothes: unionBottom
+        },
+        outer: {
+            categoryId: 3,
+            clothes: unionOuter
+        },
+        etc: {
+            categoryId: 4,
+            clothes: unionEtc
+        }
+    };
+    return unionCloset;
+};
+
 async function getClothesNumByUserId(userId) {
     const aliveClothes = await Clothes.findAndCountAll({
         where: {
@@ -78,21 +121,11 @@ async function getClothesByWeathyId(userId, weathyId) {
     for (const category of clothesCategories) {
         const categoryClothes = await Clothes.findAll({
             where: {
-                [Op.or]: [
-                    {
-                        user_id: userId,
-                        category_id: category.id,
-                        is_deleted: 0
-                    },
-                    {
-                        user_id: userId,
-                        category_id: category.id,
-                        id: {
-                            [Op.in]: weathyClothesIdList
-                        },
-                        is_deleted: 1
-                    }
-                ]
+                user_id: userId,
+                category_id: category.id,
+                id: {
+                    [Op.in]: weathyClothesIdList
+                }
             },
             order: [
                 ['updated_at', 'DESC'],
@@ -275,6 +308,7 @@ async function createDefaultClothes(userId) {
 }
 
 module.exports = {
+    unionTwoCloset,
     getClothesNumByUserId,
     getClothesByUserId,
     getClothesByWeathyId,

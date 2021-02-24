@@ -10,14 +10,14 @@ router.get('/', validateToken, weathyController.getWeathy, updateToken);
 router.post(
     '/',
     validateToken,
-    upload.single,
+    upload.single('img'),
     weathyController.createWeathy,
     updateToken
 );
 router.put(
     '/:weathyId',
     validateToken,
-    upload.single,
+    upload.single('img'),
     weathyController.modifyWeathy,
     updateToken
 );

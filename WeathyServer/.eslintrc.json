@@ -1,0 +1,35 @@
+{
+    // 코드 포맷을 prettier로 설정
+    "plugins": [
+      "prettier"
+    ],
+    "env": {
+      // "express":true,
+      "node": true,
+      "jest": true,
+      "mocha": true,
+      "browser": false,
+      "commonjs": true,
+      "es2021": true
+    },
+    "extends": [
+      "eslint:recommended",
+      "plugin:prettier/recommended"
+    ],
+    "parserOptions": {
+      "ecmaVersion": 12,
+      "sourceType": "script"
+    },
+    "ignorePatterns": [
+      "node_modules/"
+    ],
+    // ESLint 룰을 설정
+    "rules": {
+      // prettier에 맞게 룰을 설정
+      "prettier/prettier": "error"
+    },
+    "globals": {
+      "process": false,
+      "__dirname": false
+    }
+  }

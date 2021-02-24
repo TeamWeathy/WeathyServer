@@ -1,0 +1,41 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "contributors": [
+    {
+      "login": "yxxshin",
+      "name": "Yeon Sang Shin",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/63148508?v=4",
+      "profile": "https://github.com/yxxshin",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "seonuk",
+      "name": "seonuk",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/22928068?v=4",
+      "profile": "https://github.com/seonuk",
+      "contributions": [
+        "code"
+      ]
+    },{
+      "login": "dshyun0226",
+      "name": "Jahyun Kim",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/8098698?v=4",
+      "profile": "https://github.com/dshyun0226",
+      "contributions": [
+        "code"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "projectName": "WeathyServer",
+  "projectOwner": "TeamWeathy",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "skipCi": true
+}

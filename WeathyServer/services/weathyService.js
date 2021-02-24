@@ -6,8 +6,7 @@ const {
     DailyWeather,
     sequelize,
     WeathyClothes,
-    Clothes,
-    Climate
+    Clothes
 } = require('../models');
 const locationService = require('./locationService');
 const weatherService = require('./weatherService');
@@ -224,8 +223,7 @@ const checkOwnerClothes = async (clothes, userId) => {
 
     const clothesList = await Clothes.findAll({
         where: {
-            user_id: userId,
-            is_deleted: 0
+            user_id: userId
         },
         attributes: ['id']
     });
@@ -279,21 +277,6 @@ const findDailyWeatherByWeathy = async (
     return dailyWeather;
 };
 
-const getWeathyClimate = async (id) => {
-    const climate = await Climate.findOne({
-        where: {
-            icon_id: id
-        }
-    });
-    const iconId = climate.icon_id;
-    const description = climate.description;
-
-    return {
-        iconId,
-        description
-    };
-};
-
 const getWeathy = async (date, userId) => {
     const weathy = await getWeathyOnDate(date, userId);
 
@@ -311,27 +294,18 @@ const getWeathy = async (date, userId) => {
     if (!hourlyWeather) return null;
 
     const region = await locationService.getLocationByCode(code);
-
-    weathy.dailyWeather = dailyWeather;
-    weathy.hourlyWeather = hourlyWeather;
-    weathy.hourlyWeather.climate = await getWeathyClimate(
-        hourlyWeather.climate.iconId
-    );
-
     const closet = await clothesService.getWeathyCloset(weathy.id);
 
     return {
         weathy: {
             region,
             dailyWeather,
-            hourlyWeather: {
-                climate: hourlyWeather.climate,
-                pop: hourlyWeather.pop
-            },
+            hourlyWeather,
             closet,
             weathyId: weathy.id,
             stampId: weathy.emoji_id,
-            feedback: weathy.description || ''
+            feedback: weathy.description || null,
+            imgUrl: weathy.img_url || null
         }
     };
 };
@@ -341,7 +315,8 @@ const createWeathy = async (
     clothes,
     stampId,
     userId,
-    feedback = ''
+    feedback = null,
+    imgUrl = null
 ) => {
     const transaction = await sequelize.transaction();
 
@@ -351,7 +326,8 @@ const createWeathy = async (
                 user_id: userId,
                 dailyweather_id: dailyWeatherId,
                 emoji_id: stampId,
-                description: feedback
+                description: feedback,
+                img_url: imgUrl
             },
             { transaction }
         );
@@ -392,7 +368,7 @@ const modifyWeathy = async (
     code,
     clothes,
     stampId,
-    feedback
+    feedback = null
 ) => {
     const transaction = await sequelize.transaction();
 
@@ -432,6 +408,27 @@ const modifyWeathy = async (
         if (err.message === exception.NO_DAILY_WEATHER) {
             throw Error(exception.NO_DAILY_WEATHER);
         }
+        if (err instanceof UniqueConstraintError) {
+            throw Error(exception.DUPLICATION_WEATHY);
+        }
+        throw Error(exception.SERVER_ERROR);
+    }
+};
+
+const modifyImgField = async (imgUrl = null, weathyId, userId) => {
+    try {
+        await Weathy.update(
+            {
+                img_url: imgUrl
+            },
+            {
+                where: {
+                    user_id: userId,
+                    id: weathyId
+                }
+            }
+        );
+    } catch (err) {
         throw Error(exception.SERVER_ERROR);
     }
 };
@@ -442,5 +439,6 @@ module.exports = {
     createWeathy,
     deleteWeathy,
     modifyWeathy,
-    checkOwnerClothes
+    checkOwnerClothes,
+    modifyImgField
 };

@@ -161,6 +161,7 @@ async function deleteClothesByUserId(userId, clothesList) {
         let cl = await Clothes.findOne({
             where: { user_id: userId, id: clothesList[c] }
         });
+
         if (cl === null || cl.is_deleted === 1) {
             throw Error(exception.NO_CLOTHES);
         }

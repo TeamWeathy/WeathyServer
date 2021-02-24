@@ -4,11 +4,12 @@ const aws = require('aws-sdk');
 const createError = require('http-errors');
 const logger = require('winston');
 const sc = require('./statusCode');
+const exception = require('./exception');
 aws.config.loadFromPath(__dirname + '/../config/s3.json');
 
 const s3 = new aws.S3();
 
-const upload = multer({
+const uploadS3 = multer({
     storage: multerS3({
         s3,
         bucket: 'weathy',
@@ -16,6 +17,11 @@ const upload = multer({
         key: function (req, file, cb) {
             if (file && req.body.weathy) {
                 const weathy = JSON.parse(req.body.weathy);
+                console.log(weathy.userId);
+                if (!weathy.userId) {
+                    console.log('Fuck');
+                    throw exception.BAD_REQUEST;
+                }
                 cb(
                     null,
                     `ootd/${
@@ -32,5 +38,14 @@ const upload = multer({
 });
 
 module.exports = {
-    upload
+    upload: {
+        single: async function (req, res, next) {
+            console.log('hey');
+            try {
+                await uploadS3.single('img');
+            } catch (err) {
+                next(createError(sc.BAD_REQUEST, 'Invalid user id given'));
+            }
+        }
+    }
 };

@@ -15,7 +15,6 @@ const uploadS3 = multer({
         bucket: 'weathy',
         acl: 'public-read',
         key: function (req, file, cb) {
-            console.log('dog');
             if (file && req.body.weathy) {
                 const weathy = JSON.parse(req.body.weathy);
                 console.log(weathy.userId);
@@ -47,7 +46,6 @@ module.exports = {
             } catch (err) {
                 next(createError(sc.BAD_REQUEST, 'Invalid user id given'));
             }
-            next();
         }
     }
 };

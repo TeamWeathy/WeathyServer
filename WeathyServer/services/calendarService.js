@@ -9,7 +9,12 @@ module.exports = {
             include: [
                 {
                     model: DailyWeather,
-                    attributes: ['date', 'temperature_max', 'temperature_min'],
+                    attributes: [
+                        'date',
+                        'temperature_max',
+                        'temperature_min',
+                        'climate_id'
+                    ],
                     where: {
                         date: {
                             [Op.and]: {
@@ -31,6 +36,7 @@ module.exports = {
             validCalendarOverviewList.push({
                 id: weathy.id,
                 date: weathy.DailyWeather.date,
+                climateIconId: weathy.DailyWeather.climate_id,
                 stampId: weathy.emoji_id,
                 temperature: {
                     maxTemp: weathy.DailyWeather.temperature_max,

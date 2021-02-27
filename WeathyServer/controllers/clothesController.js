@@ -2,17 +2,27 @@ const createError = require('http-errors');
 const exception = require('../modules/exception');
 const statusCode = require('../modules/statusCode');
 const { clothesService } = require('../services');
+const { unionTwoCloset } = require('../services/clothesService');
 
 module.exports = {
     getClothes: async (req, res, next) => {
         const { userId } = req.params;
+        const { weathy_id: weathyId } = req.query;
 
         if (!userId) {
             next(createError(400));
         }
 
         try {
-            const closet = await clothesService.getClothesByUserId(userId);
+            let closet = await clothesService.getClothesByUserId(userId);
+
+            if (weathyId) {
+                const weathyCloset = await clothesService.getClothesByWeathyId(
+                    userId,
+                    weathyId
+                );
+                closet = unionTwoCloset(closet, weathyCloset);
+            }
             res.status(statusCode.OK).json({
                 closet: closet,
                 message: '옷 정보 조회 성공'
@@ -49,7 +59,7 @@ module.exports = {
             console.log(error.message);
             switch (error.message) {
                 case exception.ALREADY_CLOTHES:
-                    next(createError(400));
+                    next(createError(403));
                     break;
                 default:
                     next(createError(500));
@@ -69,6 +79,7 @@ module.exports = {
                 userId,
                 clothes
             );
+
             res.status(statusCode.OK).json({
                 closet: closet,
                 message: '옷 삭제 성공'

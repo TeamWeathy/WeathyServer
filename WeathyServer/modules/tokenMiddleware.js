@@ -59,29 +59,18 @@ const validateToken = async (req, res, next) => {
 const updateToken = async (req, res) => {
     // 토큰 업데이트
     // 사용되면 return res.send() 에서 return을 뺄 것
-    const transaction = await sequelize.transaction();
 
     try {
         const token = res.locals.tokenValue;
 
         const userToken = await Token.findOne({ where: { token: token } });
-        const fakeToken = generateToken(userToken.user_id);
 
-        await Token.update(
-            { token: fakeToken },
-            { where: { user_id: userToken.user_id } },
-            { transaction }
-        );
-        await Token.update(
-            { token: token },
-            { where: { user_id: userToken.user_id } },
-            { transaction }
-        );
+        userToken.changed('updatedAt', true);
+        await userToken.update({ updatedAt: new Date() });
 
-        await transaction.commit();
         return res;
     } catch (err) {
-        await transaction.rollback();
+        console.log(err);
         throw Error(exception.SERVER_ERROR);
     }
 };

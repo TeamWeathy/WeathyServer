@@ -18,6 +18,63 @@ const setClothesForm = async () => {
     return closet;
 };
 
+const unionTwoCloset = (closet1, closet2) => {
+    const top1 = closet1.top.clothes;
+    const top2 = closet2.top.clothes;
+    const unionTop = top2.concat(top1).filter(function (cl) {
+        return this.has(cl.id) ? false : this.add(cl.id);
+    }, new Set());
+    const bottom1 = closet1.bottom.clothes;
+    const bottom2 = closet2.bottom.clothes;
+    const unionBottom = bottom2.concat(bottom1).filter(function (cl) {
+        return this.has(cl.id) ? false : this.add(cl.id);
+    }, new Set());
+    const outer1 = closet1.outer.clothes;
+    const outer2 = closet2.outer.clothes;
+    const unionOuter = outer2.concat(outer1).filter(function (cl) {
+        return this.has(cl.id) ? false : this.add(cl.id);
+    }, new Set());
+    const etc1 = closet1.etc.clothes;
+    const etc2 = closet2.etc.clothes;
+    const unionEtc = etc2.concat(etc1).filter(function (cl) {
+        return this.has(cl.id) ? false : this.add(cl.id);
+    }, new Set());
+
+    const unionCloset = {
+        top: {
+            categoryId: 1,
+            clothesNum: top1.length,
+            clothes: unionTop
+        },
+        bottom: {
+            categoryId: 2,
+            clothesNum: bottom1.length,
+            clothes: unionBottom
+        },
+        outer: {
+            categoryId: 3,
+            clothesNum: outer1.length,
+            clothes: unionOuter
+        },
+        etc: {
+            categoryId: 4,
+            clothesNum: etc1.length,
+            clothes: unionEtc
+        }
+    };
+    return unionCloset;
+};
+
+async function getClothesNumByUserId(userId) {
+    const aliveClothes = await Clothes.findAndCountAll({
+        where: {
+            user_id: userId,
+            is_deleted: 0
+        }
+    });
+    return aliveClothes.count;
+}
+
 async function getClothesByUserId(userId) {
     const responseCloset = new Object();
     const clothesCategories = await ClothesCategory.findAll();
@@ -45,6 +102,53 @@ async function getClothesByUserId(userId) {
             categoryClothesList.push(clothes);
         });
         categoryCloset.clothes = categoryClothesList;
+        categoryCloset.clothesNum = categoryClothesList.length;
+        responseCloset[category.name] = categoryCloset;
+    }
+    return responseCloset;
+}
+
+async function getClothesByWeathyId(userId, weathyId) {
+    const responseCloset = new Object();
+    const clothesCategories = await ClothesCategory.findAll();
+
+    const weathyClothes = await WeathyClothes.findAll({
+        where: {
+            weathy_id: weathyId
+        },
+        attributes: ['clothes_id']
+    });
+    const weathyClothesIdList = new Array();
+    await weathyClothes.forEach((e) => {
+        weathyClothesIdList.push(e.dataValues.clothes_id);
+    });
+
+    for (const category of clothesCategories) {
+        const categoryClothes = await Clothes.findAll({
+            where: {
+                user_id: userId,
+                category_id: category.id,
+                id: {
+                    [Op.in]: weathyClothesIdList
+                }
+            },
+            order: [
+                ['updated_at', 'DESC'],
+                ['id', 'DESC']
+            ]
+        });
+
+        const categoryCloset = new Object();
+        categoryCloset.categoryId = category.id;
+        const categoryClothesList = new Array();
+        await categoryClothes.forEach((element) => {
+            const clothes = new Object();
+            clothes.id = element.id;
+            clothes.name = element.name;
+            categoryClothesList.push(clothes);
+        });
+        categoryCloset.clothes = categoryClothesList;
+        categoryCloset.clothesNum = categoryClothesList.length;
         responseCloset[category.name] = categoryCloset;
     }
     return responseCloset;
@@ -85,6 +189,10 @@ async function getWeathyCloset(weathyId) {
                 id: clothesId,
                 name: clothesName
             });
+        }
+
+        for (let category of Object.keys(closet)) {
+            closet[category].clothesNum = closet[category].clothes.length;
         }
 
         return closet;
@@ -150,6 +258,7 @@ async function addClothesByUserId(userId, category, name) {
         } else {
             categoryCloset.clothes = [];
         }
+        categoryCloset.clothesNum = categoryCloset.clothes.length;
         responseCloset[ca.name] = categoryCloset;
     }
     return responseCloset;
@@ -199,19 +308,34 @@ async function createDefaultClothes(userId) {
     await createClothesByName(userId, 1, '니트');
     await createClothesByName(userId, 1, '후드티');
     await createClothesByName(userId, 1, '티셔츠');
-    await createClothesByName(userId, 2, '데님팬츠');
-    await createClothesByName(userId, 2, '스커트');
+    await createClothesByName(userId, 1, '셔츠');
+    await createClothesByName(userId, 1, '블라우스');
+    await createClothesByName(userId, 1, '나시');
+    await createClothesByName(userId, 2, '청바지');
     await createClothesByName(userId, 2, '슬랙스');
+    await createClothesByName(userId, 2, '면바지');
+    await createClothesByName(userId, 2, '트레이닝복');
+    await createClothesByName(userId, 2, '스커트');
+    await createClothesByName(userId, 2, '레깅스');
     await createClothesByName(userId, 3, '패딩');
     await createClothesByName(userId, 3, '코트');
+    await createClothesByName(userId, 3, '재킷');
     await createClothesByName(userId, 3, '점퍼');
+    await createClothesByName(userId, 3, '가디건');
+    await createClothesByName(userId, 3, '경량패딩');
     await createClothesByName(userId, 4, '목도리');
     await createClothesByName(userId, 4, '장갑');
     await createClothesByName(userId, 4, '모자');
+    await createClothesByName(userId, 4, '부츠');
+    await createClothesByName(userId, 4, '스니커즈');
+    await createClothesByName(userId, 4, '로퍼');
 }
 
 module.exports = {
+    unionTwoCloset,
+    getClothesNumByUserId,
     getClothesByUserId,
+    getClothesByWeathyId,
     addClothesByUserId,
     deleteClothesByUserId,
     getWeathyCloset,

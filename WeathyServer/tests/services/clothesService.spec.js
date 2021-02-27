@@ -1,12 +1,43 @@
 const assert = require('assert');
-const { Clothes } = require('../../models');
+const { Clothes, Weathy } = require('../../models');
 const {
     getClothesByUserId,
     addClothesByUserId,
-    deleteClothesByUserId
+    deleteClothesByUserId,
+    getClothesNumByUserId,
+    getClothesByWeathyId
 } = require('../../services/clothesService');
+const { createWeathy, deleteWeathy } = require('../../services/weathyService');
 
 describe('clothesService test', function () {
+    describe('getClothesNumByUserId test', () => {
+        // uses userId = 450 (Has only original clothes: 12 clothes)
+        const userId = 450;
+        it('getClothesNumByUserId returns clothesNum', async () => {
+            const firstClothesNum = await getClothesNumByUserId(userId);
+            assert.strictEqual(firstClothesNum, 12);
+
+            // add one clothes for test
+            const testClothesName = 'Test_Cl';
+            await addClothesByUserId(userId, 1, testClothesName);
+            const secondClothesNum = await getClothesNumByUserId(userId);
+            assert.strictEqual(secondClothesNum, 13);
+
+            // delete the clothes
+            const testClothes = await Clothes.findOne({
+                where: {
+                    user_id: userId,
+                    name: testClothesName
+                }
+            });
+            const clothesList = new Array();
+            clothesList.push(testClothes.id);
+            await deleteClothesByUserId(userId, clothesList);
+            const thirdClothesNum = await getClothesNumByUserId(userId);
+            assert.strictEqual(thirdClothesNum, 12);
+        });
+    });
+
     describe('getClothesByUserId test', () => {
         let closet, userId;
         before('get closet', async () => {
@@ -17,6 +48,49 @@ describe('clothesService test', function () {
             assert.strictEqual(closet.bottom.categoryId, 2);
             assert.strictEqual(closet.bottom.clothes[0].id, 16);
             assert.strictEqual(closet.bottom.clothes[0].name, '바지1');
+        });
+    });
+
+    describe('getClothesByWeathyID test', () => {
+        const userId = 450;
+        const testClothesName = 'testC';
+        let testWeathyId, testClothesId;
+        before('Add Clothes -> Record Weathy -> Delete Clothes', async () => {
+            await addClothesByUserId(userId, 1, testClothesName);
+            const testClothes = await Clothes.findOne({
+                where: {
+                    user_id: userId,
+                    name: testClothesName
+                }
+            });
+            testClothesId = testClothes.id;
+            const recordedClothesList = [5035, 5040, 5043];
+            recordedClothesList.push(testClothesId);
+
+            await createWeathy(1, recordedClothesList, 3, userId, 'TEST');
+
+            const testWeathy = await Weathy.findOne({
+                where: {
+                    user_id: userId,
+                    dailyWeather_id: 1
+                }
+            });
+            testWeathyId = testWeathy.id;
+
+            const testClothesList = new Array();
+            testClothesList.push(testClothesId);
+
+            await deleteClothesByUserId(userId, testClothesList);
+        });
+
+        after('Delete Clothes and Weathy', async () => {
+            await deleteWeathy(testWeathyId, userId);
+        });
+
+        it('getClothesByWeathyId should store clothes deleted after record', async () => {
+            const closet = await getClothesByWeathyId(userId, testWeathyId);
+            assert.strictEqual(closet.top.clothes[0].id, testClothesId);
+            assert.strictEqual(closet.top.clothes[0].name, testClothesName);
         });
     });
 

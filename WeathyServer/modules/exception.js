@@ -28,6 +28,8 @@ module.exports = {
 
     // REQUEST
     BAD_REQUEST: 'BAD_REQUEST',
+
+    CANNOT_UPLOAD_FILE: 'CANNOT_UPLOAD_FILE',
     // SERVER
     SERVER_ERROR: 'SERVER_ ERROR'
 };

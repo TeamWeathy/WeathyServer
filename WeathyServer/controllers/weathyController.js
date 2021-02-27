@@ -7,6 +7,8 @@ const weatherService = require('../services/weatherService');
 const exception = require('../modules/exception');
 const logger = require('winston');
 
+const { uploadS3 } = require('../modules/uploadFile');
+
 module.exports = {
     getRecommendedWeathy: async (req, res, next) => {
         const { code, date } = req.query;
@@ -99,8 +101,9 @@ module.exports = {
                 userId
             } = weathyParams;
             const dateRegex = /^(19|20)\d{2}-(0[1-9]|1[012])-(0[1-9]|[12][0-9]|3[0-1])$/;
-            const imgUrl = req.file ? req.file.location : null;
+            const isExistFile = req.file ? true : false;
             const resUserId = res.locals.userId;
+            let imgUrl;
 
             if (!dateRegex.test(date) || !code || !clothes || !stampId)
                 throw Error(exception.BAD_REQUEST);
@@ -136,6 +139,11 @@ module.exports = {
                     )
                 );
             }
+
+            if (await weathyService.isDuplicateWeathy(userId, dailyWeatherId))
+                throw Error(exception.DUPLICATION_WEATHY);
+
+            if (isExistFile) imgUrl = await uploadS3(userId, req.file.buffer);
 
             const weathyId = await weathyService.createWeathy(
                 dailyWeatherId,
@@ -192,7 +200,7 @@ module.exports = {
             const weathyParams = JSON.parse(req.body.weathy);
             const { weathyId } = req.params;
             const { code, clothes, stampId, feedback, isDelete } = weathyParams;
-            const imgUrl = req.file && !isDelete ? req.file.location : null;
+            const isExistFile = req.file ? true : false;
             const userId = res.locals.userId;
 
             const checkOwnerClothes = await weathyService.checkOwnerClothes(
@@ -220,13 +228,13 @@ module.exports = {
 
             if (!weathy) throw Error(exception.NO_AUTHORITY);
 
-            if (imgUrl || isDelete) {
-                // 삭제 또는 수정 시
-                await weathyService.modifyImgField(
-                    imgUrl || null,
-                    weathyId,
-                    userId
-                );
+            if (isExistFile && !isDelete) {
+                //수정 시
+                const imgUrl = await uploadS3(userId, req.file.buffer);
+                await weathyService.modifyImgField(imgUrl, weathyId, userId);
+            } else if (!isExistFile && isDelete) {
+                //삭제 시
+                await weathyService.modifyImgField(null, weathyId, userId);
             }
 
             res.status(sc.OK).json({
@@ -259,6 +267,13 @@ module.exports = {
                     );
                 case exception.BAD_REQUEST:
                     return next(createError(sc.BAD_REQUEST, 'Parameter Error'));
+                case exception.CANNOT_UPLOAD_FILE:
+                    return next(
+                        createError(
+                            sc.INTERNAL_SERVER_ERROR,
+                            'Cannot upload File'
+                        )
+                    );
                 default:
                     return next(createError(sc.INTERNAL_SERVER_ERROR));
             }

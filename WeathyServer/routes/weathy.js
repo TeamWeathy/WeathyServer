@@ -2,22 +2,21 @@ const express = require('express');
 const router = express.Router();
 
 const weathyController = require('../controllers/weathyController');
-const { upload } = require('../modules/uploadFile');
-
 const { validateToken, updateToken } = require('../modules/tokenMiddleware');
+const multer = require('multer');
 
 router.get('/', validateToken, weathyController.getWeathy, updateToken);
 router.post(
     '/',
     validateToken,
-    upload.single('img'),
+    multer().single('img'),
     weathyController.createWeathy,
     updateToken
 );
 router.put(
     '/:weathyId',
     validateToken,
-    upload.single('img'),
+    multer().single('img'),
     weathyController.modifyWeathy,
     updateToken
 );

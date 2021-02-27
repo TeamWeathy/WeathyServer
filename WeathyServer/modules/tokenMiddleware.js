@@ -19,7 +19,7 @@ const validateToken = async (req, res, next) => {
     const userToken = await Token.findOne({ where: { token: token } });
     // 2-1. token 객체가 DB에 존재해야 한다
     if (userToken === null) {
-        return next(createError(sc.BAD_REQUEST, 'No Matching Token on DB'));
+        return next(createError(sc.INVALID_ACCOUNT, 'No Matching Token on DB'));
     } else if (!isUserOwnerOfToken(userToken.user_id, token)) {
         // 2-2. 객체의 userId와 토큰에 포함된 id가 같아야 한다
         return next(createError(sc.INVALID_ACCOUNT, 'Token user_id is wrong'));

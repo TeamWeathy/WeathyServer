@@ -43,18 +43,22 @@ const unionTwoCloset = (closet1, closet2) => {
     const unionCloset = {
         top: {
             categoryId: 1,
+            clothesNum: top1.length,
             clothes: unionTop
         },
         bottom: {
             categoryId: 2,
+            clothesNum: bottom1.length,
             clothes: unionBottom
         },
         outer: {
             categoryId: 3,
+            clothesNum: outer1.length,
             clothes: unionOuter
         },
         etc: {
             categoryId: 4,
+            clothesNum: etc1.length,
             clothes: unionEtc
         }
     };
@@ -98,6 +102,7 @@ async function getClothesByUserId(userId) {
             categoryClothesList.push(clothes);
         });
         categoryCloset.clothes = categoryClothesList;
+        categoryCloset.clothesNum = categoryClothesList.length;
         responseCloset[category.name] = categoryCloset;
     }
     return responseCloset;
@@ -143,6 +148,7 @@ async function getClothesByWeathyId(userId, weathyId) {
             categoryClothesList.push(clothes);
         });
         categoryCloset.clothes = categoryClothesList;
+        categoryCloset.clothesNum = categoryClothesList.length;
         responseCloset[category.name] = categoryCloset;
     }
     return responseCloset;
@@ -248,6 +254,7 @@ async function addClothesByUserId(userId, category, name) {
         } else {
             categoryCloset.clothes = [];
         }
+        categoryCloset.clothesNum = categoryCloset.clothes.length;
         responseCloset[ca.name] = categoryCloset;
     }
     return responseCloset;

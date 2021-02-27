@@ -12,6 +12,8 @@ const locationService = require('./locationService');
 const weatherService = require('./weatherService');
 const clothesService = require('./clothesService');
 const exception = require('../modules/exception');
+const { async } = require('crypto-random-string');
+const dailyWeather = require('../models/dailyWeather');
 
 const calculateConditionPoint = (candidate, todayWeather) => {
     const { todayTemp, todayClimateId } = todayWeather;
@@ -433,6 +435,23 @@ const modifyImgField = async (imgUrl = null, weathyId, userId) => {
     }
 };
 
+const isDuplicateWeathy = async (dailyWeatherId, userId) => {
+    try {
+        const count = await Weathy.count({
+            where: {
+                user_id: userId,
+                dailyweather_id: dailyWeatherId
+            }
+        });
+        console.log('카운트' + count);
+        if (count) return true;
+        console.log('false');
+        return false;
+    } catch (err) {
+        throw Error(exception.SERVER_ERROR);
+    }
+};
+
 module.exports = {
     getRecommendedWeathy,
     getWeathy,
@@ -440,5 +459,6 @@ module.exports = {
     deleteWeathy,
     modifyWeathy,
     checkOwnerClothes,
-    modifyImgField
+    modifyImgField,
+    isDuplicateWeathy
 };

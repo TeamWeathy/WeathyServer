@@ -5,47 +5,32 @@ const createError = require('http-errors');
 const logger = require('winston');
 const sc = require('./statusCode');
 const exception = require('./exception');
+
 aws.config.loadFromPath(__dirname + '/../config/s3.json');
 
 const s3 = new aws.S3();
 
-const uploadS3 = multer({
-    storage: multerS3({
-        s3,
-        bucket: 'weathy',
-        acl: 'public-read',
-        key: function (req, file, cb) {
-            if (file && req.body.weathy) {
-                const weathy = JSON.parse(req.body.weathy);
-                console.log(weathy.userId);
-                if (!weathy.userId) {
-                    console.log('Fuck');
-                    throw exception.BAD_REQUEST;
-                }
-                cb(
-                    null,
-                    `ootd/${
-                        weathy.userId
-                    }/${Date.now()}.${file.originalname.split('.').pop()}`
-                );
+const uploadS3 = (userId, file) => {
+    const param = {
+        Bucket: 'weathy',
+        Key: `ootd/${userId}/${Date.now()}.jpeg`,
+        ACL: 'public-read',
+        Body: file,
+        ContentType: 'image/jpeg'
+    };
+
+    return new Promise((res, rej) => {
+        s3.upload(param, function (err, data) {
+            if (err) {
+                logger.error(err);
+                rej(Error(exception.SERVER_ERROR));
+            } else {
+                res(data.Location);
             }
-        },
-        onError: function (err, next) {
-            logger.error(err.stack);
-            next(createError(sc.BAD_REQUEST, 'File Error'));
-        }
-    })
-});
+        });
+    });
+};
 
 module.exports = {
-    upload: {
-        single: async function (req, res, next) {
-            console.log('hey');
-            try {
-                await uploadS3.single('img');
-            } catch (err) {
-                next(createError(sc.BAD_REQUEST, 'Invalid user id given'));
-            }
-        }
-    }
+    uploadS3
 };

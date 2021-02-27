@@ -191,6 +191,10 @@ async function getWeathyCloset(weathyId) {
             });
         }
 
+        for (let category of Object.keys(closet)) {
+            closet[category].clothesNum = closet[category].clothes.length;
+        }
+
         return closet;
     } catch (err) {
         throw Error(exception.SERVER_ERROR);

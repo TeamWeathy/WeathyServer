@@ -453,6 +453,21 @@ const modifyImgField = async (imgUrl = null, weathyId, userId) => {
     }
 };
 
+const isDuplicateWeathy = async (dailyWeatherId, userId) => {
+    try {
+        const count = await Weathy.count({
+            where: {
+                user_id: userId,
+                dailyweather_id: dailyWeatherId
+            }
+        });
+        if (count) return true;
+        return false;
+    } catch (err) {
+        throw Error(exception.SERVER_ERROR);
+    }
+};
+
 module.exports = {
     getRecommendedWeathy,
     getWeathy,
@@ -460,5 +475,6 @@ module.exports = {
     deleteWeathy,
     modifyWeathy,
     checkOwnerClothes,
-    modifyImgField
+    modifyImgField,
+    isDuplicateWeathy
 };

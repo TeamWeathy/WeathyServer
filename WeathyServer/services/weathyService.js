@@ -6,15 +6,12 @@ const {
     DailyWeather,
     sequelize,
     WeathyClothes,
-    Clothes,
-    Climate
+    Clothes
 } = require('../models');
 const locationService = require('./locationService');
 const weatherService = require('./weatherService');
 const clothesService = require('./clothesService');
 const exception = require('../modules/exception');
-const { async } = require('crypto-random-string');
-const dailyWeather = require('../models/dailyWeather');
 
 const calculateConditionPoint = (candidate, todayWeather) => {
     const { todayTemp, todayClimateId } = todayWeather;
@@ -280,21 +277,6 @@ const findDailyWeatherByWeathy = async (
     return dailyWeather;
 };
 
-const getWeathyClimate = async (id) => {
-    const climate = await Climate.findOne({
-        where: {
-            icon_id: id
-        }
-    });
-    const iconId = climate.icon_id;
-    const description = climate.description;
-
-    return {
-        iconId,
-        description
-    };
-};
-
 const getWeathy = async (date, userId) => {
     const weathy = await getWeathyOnDate(date, userId);
 
@@ -310,10 +292,6 @@ const getWeathy = async (date, userId) => {
     );
 
     if (!hourlyWeather) return null;
-
-    hourlyWeather.climate = await getWeathyClimate(
-        hourlyWeather.climate.iconId
-    );
 
     const region = await locationService.getLocationByCode(code);
     const closet = await clothesService.getWeathyCloset(weathy.id);
@@ -463,9 +441,7 @@ const isDuplicateWeathy = async (dailyWeatherId, userId) => {
                 dailyweather_id: dailyWeatherId
             }
         });
-        console.log('카운트' + count);
         if (count) return true;
-        console.log('false');
         return false;
     } catch (err) {
         throw Error(exception.SERVER_ERROR);

@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 
 const weathyController = require('../controllers/weathyController');
-const { upload, uploadS3 } = require('../modules/uploadFile');
 const { validateToken, updateToken } = require('../modules/tokenMiddleware');
 const multer = require('multer');
 

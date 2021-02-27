@@ -7,7 +7,7 @@ const weatherService = require('../services/weatherService');
 const exception = require('../modules/exception');
 const logger = require('winston');
 
-const { uploadS3, upload, temp } = require('../modules/uploadFile');
+const { uploadS3 } = require('../modules/uploadFile');
 
 module.exports = {
     getRecommendedWeathy: async (req, res, next) => {

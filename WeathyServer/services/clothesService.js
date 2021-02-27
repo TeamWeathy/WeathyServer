@@ -297,15 +297,27 @@ async function createDefaultClothes(userId) {
     await createClothesByName(userId, 1, '니트');
     await createClothesByName(userId, 1, '후드티');
     await createClothesByName(userId, 1, '티셔츠');
-    await createClothesByName(userId, 2, '데님팬츠');
-    await createClothesByName(userId, 2, '스커트');
+    await createClothesByName(userId, 1, '셔츠');
+    await createClothesByName(userId, 1, '블라우스');
+    await createClothesByName(userId, 1, '나시');
+    await createClothesByName(userId, 2, '청바지');
     await createClothesByName(userId, 2, '슬랙스');
+    await createClothesByName(userId, 2, '면바지');
+    await createClothesByName(userId, 2, '트레이닝복');
+    await createClothesByName(userId, 2, '스커트');
+    await createClothesByName(userId, 2, '레깅스');
     await createClothesByName(userId, 3, '패딩');
     await createClothesByName(userId, 3, '코트');
+    await createClothesByName(userId, 3, '재킷');
     await createClothesByName(userId, 3, '점퍼');
+    await createClothesByName(userId, 3, '가디건');
+    await createClothesByName(userId, 3, '경량패딩');
     await createClothesByName(userId, 4, '목도리');
     await createClothesByName(userId, 4, '장갑');
     await createClothesByName(userId, 4, '모자');
+    await createClothesByName(userId, 4, '부츠');
+    await createClothesByName(userId, 4, '스니커즈');
+    await createClothesByName(userId, 4, '로퍼');
 }
 
 module.exports = {

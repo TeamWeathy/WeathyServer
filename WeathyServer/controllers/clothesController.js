@@ -37,6 +37,7 @@ module.exports = {
     },
     addClothes: async (req, res, next) => {
         const { userId } = req.params;
+        const { weathy_id: weathyId } = req.query;
         const { category, name } = req.body;
 
         if (!userId || !category || !name) {
@@ -44,14 +45,18 @@ module.exports = {
         }
 
         try {
-            const clothesList = await clothesService.addClothesByUserId(
-                userId,
-                category,
-                name
-            );
+            await clothesService.addClothesByUserId(userId, category, name);
+            let closet = await clothesService.getClothesByUserId(userId);
+            if (weathyId) {
+                const weathyCloset = await clothesService.getClothesByWeathyId(
+                    userId,
+                    weathyId
+                );
+                closet = unionTwoCloset(closet, weathyCloset);
+            }
 
             res.status(statusCode.OK).json({
-                clothesList: clothesList,
+                closet,
                 message: '옷 추가 성공'
             });
             next();

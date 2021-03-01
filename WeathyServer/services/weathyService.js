@@ -311,8 +311,8 @@ const getWeathy = async (date, userId) => {
     if (!hourlyWeather) return null;
 
     // Hotfix. Should be updated in the future.
-    hourlyWeather.climate.iconId = await getDailyClimateId(code, date)
-        .climateId;
+    const dailyClimate = await getDailyClimateId(code, date);
+    hourlyWeather.climate.iconId = dailyClimate.climateId;
     hourlyWeather.climate = await getWeathyClimate(
         hourlyWeather.climate.iconId
     );

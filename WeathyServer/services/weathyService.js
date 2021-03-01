@@ -13,6 +13,7 @@ const locationService = require('./locationService');
 const weatherService = require('./weatherService');
 const clothesService = require('./clothesService');
 const exception = require('../modules/exception');
+const { getDailyClimateId } = require('./weatherService');
 
 const calculateConditionPoint = (candidate, todayWeather) => {
     const { todayTemp, todayClimateId } = todayWeather;
@@ -309,6 +310,9 @@ const getWeathy = async (date, userId) => {
 
     if (!hourlyWeather) return null;
 
+    // Hotfix. Should be updated in the future.
+    hourlyWeather.climate.iconId = await getDailyClimateId(code, date)
+        .climateId;
     hourlyWeather.climate = await getWeathyClimate(
         hourlyWeather.climate.iconId
     );

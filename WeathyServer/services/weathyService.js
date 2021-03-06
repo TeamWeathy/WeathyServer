@@ -6,12 +6,12 @@ const {
     DailyWeather,
     sequelize,
     WeathyClothes,
-    Clothes,
-    Climate
+    Clothes
 } = require('../models');
 const locationService = require('./locationService');
 const weatherService = require('./weatherService');
 const clothesService = require('./clothesService');
+const climateService = require('./climateService');
 const exception = require('../modules/exception');
 const { getDailyClimateId } = require('./weatherService');
 
@@ -279,21 +279,6 @@ const findDailyWeatherByWeathy = async (
     return dailyWeather;
 };
 
-const getWeathyClimate = async (id) => {
-    const climate = await Climate.findOne({
-        where: {
-            icon_id: id
-        }
-    });
-    const iconId = climate.icon_id;
-    const description = climate.description;
-
-    return {
-        iconId,
-        description
-    };
-};
-
 const getWeathy = async (date, userId) => {
     const weathy = await getWeathyOnDate(date, userId);
 
@@ -313,7 +298,7 @@ const getWeathy = async (date, userId) => {
     // Hotfix. Should be updated in the future.
     const dailyClimate = await getDailyClimateId(code, date);
     hourlyWeather.climate.iconId = dailyClimate.climateId;
-    hourlyWeather.climate = await getWeathyClimate(
+    hourlyWeather.climate = await climateService.getClimateByIconId(
         hourlyWeather.climate.iconId
     );
 

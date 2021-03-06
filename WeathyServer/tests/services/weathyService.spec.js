@@ -20,7 +20,7 @@ const assertDailyWeather = (dailyWeather) => {
 const assertHourlyWeather = (hourlyWeather) => {
     assert.strictEqual(hourlyWeather.time, '오후 12시');
     assert.strictEqual(typeof hourlyWeather.temperature, 'number');
-    assert.strictEqual(hourlyWeather.climate.iconId, 2);
+    // assert.strictEqual(hourlyWeather.climate.iconId, 2); dailyClimateIconId
     assert.strictEqual(hourlyWeather.pop, 0);
 };
 
@@ -38,7 +38,7 @@ const assertWeathy = ({ weathy }) => {
     assertClosetWeather(weathy.closet);
 
     assert.strictEqual(weathy.weathyId, 32);
-    assert.strictEqual(weathy.stampId, 2);
+    assert.strictEqual(weathy.stampId, 1);
 
     assert.ok(weathy.feedback === null || typeof weathy.feedback === 'string');
     assert.ok(weathy.imgUrl === null || typeof weathy.imgUrl === 'string');

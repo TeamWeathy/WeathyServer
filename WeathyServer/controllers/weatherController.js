@@ -26,7 +26,7 @@ module.exports = {
             }
         }
 
-        let time = date.split('T')[1] ? date.split('T')[1] : 12;
+        let time = date.split('T')[1] ? date.split('T')[1] : -1;
         date = date.split('T')[0];
         if (!date || !time) {
             return next(createError(400));

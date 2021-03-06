@@ -96,7 +96,7 @@ module.exports = {
     getDailyWeatherWithClimateIconId,
     getOverviewWeather: async (code, date, hour, timeFormat) => {
         let dailyClimate;
-        if (hour === -1) {
+        if (!hour) {
             hour = 12;
 
             const dailyWeatherWithClimate = await getDailyWeatherWithClimateIconId(

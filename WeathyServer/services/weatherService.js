@@ -69,32 +69,47 @@ const getHourlyWeather = async (code, date, hour, timeFormat) => {
         pop: hourlyWeather.pop
     };
 };
+const getDailyWeatherWithClimateIconId = async (code, date) => {
+    const dailyWeather = await DailyWeather.findOne({
+        where: { location_id: code, date: date }
+    });
+    if (!dailyWeather) {
+        return null;
+    }
+    return {
+        date: {
+            month: dateUtils.getMonth(dailyWeather.date),
+            day: dateUtils.getDay(dailyWeather.date),
+            dayOfWeek: dateUtils.getYoil(dailyWeather.date)
+        },
+        temperature: {
+            maxTemp: dailyWeather.temperature_max,
+            minTemp: dailyWeather.temperature_min
+        },
+        climateIconId: dailyWeather.climate_id
+    };
+};
 
 module.exports = {
     getHourlyWeather,
     getDailyWeather,
-    getDailyWeatherWithClimateIconId: async (code, date) => {
-        const dailyWeather = await DailyWeather.findOne({
-            where: { location_id: code, date: date }
-        });
-        if (!dailyWeather) {
-            return null;
-        }
-        return {
-            date: {
-                month: dateUtils.getMonth(dailyWeather.date),
-                day: dateUtils.getDay(dailyWeather.date),
-                dayOfWeek: dateUtils.getYoil(dailyWeather.date)
-            },
-            temperature: {
-                maxTemp: dailyWeather.temperature_max,
-                minTemp: dailyWeather.temperature_min
-            },
-            climateIconId: dailyWeather.climate_id
-        };
-    },
-
+    getDailyWeatherWithClimateIconId,
     getOverviewWeather: async (code, date, hour, timeFormat) => {
+        let dailyClimate;
+        if (!hour) {
+            hour = 12;
+
+            const dailyWeatherWithClimate = await getDailyWeatherWithClimateIconId(
+                code,
+                date
+            );
+
+            if (!dailyWeatherWithClimate) return null;
+
+            dailyClimate = await climateService.getClimateByIconId(
+                dailyWeatherWithClimate.climateIconId
+            );
+        }
         const location = await locationService.getLocationByCode(code);
         const dailyWeather = await getDailyWeather(code, date);
         const hourlyWeather = await getHourlyWeather(
@@ -103,9 +118,13 @@ module.exports = {
             hour,
             timeFormat
         );
+
         if (!dailyWeather || !hourlyWeather) {
             return null;
         }
+
+        if (dailyClimate) hourlyWeather.climate = dailyClimate;
+
         return {
             region: location,
             dailyWeather,

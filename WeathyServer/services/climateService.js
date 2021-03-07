@@ -50,6 +50,20 @@ const getDescription = async (climate_id, temperature) => {
     return climateMessages[idx].description;
 };
 
+const getClimateByIconId = async (id) => {
+    const climate = await Climate.findOne({
+        where: {
+            icon_id: id
+        }
+    });
+    const iconId = climate.icon_id;
+    const description = climate.description;
+
+    return {
+        iconId,
+        description
+    };
+};
 module.exports = {
     getClimate: async (id, temperature) => {
         const icon_id = await getIconId(id);
@@ -59,5 +73,6 @@ module.exports = {
             description: description
         };
     },
-    getIconId
+    getIconId,
+    getClimateByIconId
 };

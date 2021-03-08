@@ -133,8 +133,16 @@ module.exports = {
     },
 
     getOverviewWeathers: async (keyword, date, hour, timeFormat) => {
+        let defaultClimateFlag = false;
+
+        if (!hour) {
+            hour = 12;
+            defaultClimateFlag = true;
+        }
+
         const locations = await locationService.getLocationsByKeyword(keyword);
         let overviewWeatherList = [];
+
         for (let i = 0; i < locations.length; ++i) {
             const location = locations[i];
             const dailyWeather = await getDailyWeather(
@@ -150,6 +158,19 @@ module.exports = {
             if (!dailyWeather || !hourlyWeather) {
                 continue;
             }
+            if (defaultClimateFlag) {
+                const dailyWeatherWithClimate = await getDailyWeatherWithClimateIconId(
+                    location.dataValues.code,
+                    date
+                );
+
+                if (!dailyWeatherWithClimate) continue;
+
+                hourlyWeather.climate = await climateService.getClimateByIconId(
+                    dailyWeatherWithClimate.climateIconId
+                );
+            }
+
             overviewWeatherList.push({
                 region: location,
                 dailyWeather,

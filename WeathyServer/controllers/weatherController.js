@@ -150,12 +150,10 @@ module.exports = {
             return next(createError(400));
         }
 
-        let time = date.split('T')[1];
+        let time = date.split('T')[1] || null;
         date = date.split('T')[0];
-        if (!time) {
-            time = 12;
-        }
-        if (!date || !time) {
+
+        if (!date) {
             return next(createError(400));
         }
 
@@ -166,6 +164,7 @@ module.exports = {
                 time,
                 dateUtils.format12
             );
+
             return res.status(statusCode.OK).json({
                 overviewWeatherList,
                 message: '검색 성공'

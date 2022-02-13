@@ -29,6 +29,9 @@ app.use(express.static("public", options));
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
+const db = require('./models/index.js');
+
+
 app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));

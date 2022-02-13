@@ -1,7 +1,14 @@
+const Sequelize = require('sequelize');
+
 module.exports = (sequelize, DataTypes) => {
     return sequelize.define(
         'Locations',
         {
+            id: {
+                type: Sequelize.BIGINT,
+                autoIncrement: true,
+                primaryKey: true
+            },
             name: {
                 type: DataTypes.STRING(45),
                 allowNull: false
